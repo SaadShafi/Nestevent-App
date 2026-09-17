@@ -1,4 +1,25 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(adb -s emulator-5554 shell input swipe 540 700 540 1800 300)",
+      "Bash(adb -s emulator-5554 shell input tap 540 915)",
+      "Bash(/private/tmp/claude-501/-Users-saadshafi-Desktop-Repos-nestevent-app/ce88ae68-9e8e-409b-9cca-44d600d0cec0/scratchpad/shot.sh 23-picker 3)",
+      "Bash(/private/tmp/claude-501/-Users-saadshafi-Desktop-Repos-nestevent-app/ce88ae68-9e8e-409b-9cca-44d600d0cec0/scratchpad/shot.sh 25-role-org 1)",
+      "Bash(adb -s emulator-5554 shell input tap 540 1480)",
+      "Bash(/private/tmp/claude-501/-Users-saadshafi-Desktop-Repos-nestevent-app/ce88ae68-9e8e-409b-9cca-44d600d0cec0/scratchpad/qa/shot.sh home-locate *)",
+      "Bash(/private/tmp/claude-501/-Users-saadshafi-Desktop-Repos-nestevent-app/ce88ae68-9e8e-409b-9cca-44d600d0cec0/scratchpad/qa/shot.sh ticket-share *)",
+      "Bash(/private/tmp/claude-501/-Users-saadshafi-Desktop-Repos-nestevent-app/ce88ae68-9e8e-409b-9cca-44d600d0cec0/scratchpad/qa/shot.sh profile2 *)",
+      "Bash(/private/tmp/claude-501/-Users-saadshafi-Desktop-Repos-nestevent-app/ce88ae68-9e8e-409b-9cca-44d600d0cec0/scratchpad/qa/shot.sh chat2 *)",
+      "Bash(/private/tmp/claude-501/-Users-saadshafi-Desktop-Repos-nestevent-app/ce88ae68-9e8e-409b-9cca-44d600d0cec0/scratchpad/qa/shot.sh select-role2 *)",
+      "Bash(adb -s emulator-5554 shell input swipe 120 2195 1020 2195 700)",
+      "Bash(/private/tmp/claude-501/-Users-saadshafi-Desktop-Repos-nestevent-app/ce88ae68-9e8e-409b-9cca-44d600d0cec0/scratchpad/shot.sh 26-after-signin 4)",
+      "Bash(/private/tmp/claude-501/-Users-saadshafi-Desktop-Repos-nestevent-app/ce88ae68-9e8e-409b-9cca-44d600d0cec0/scratchpad/nav.sh settings *)",
+      "Bash(adb -s emulator-5554 logcat -d -t 100)",
+      "Bash(lsof -nP -iTCP:8081 -sTCP:LISTEN)",
+      "Bash(awk '{print $2, $11, $12, $13, $14, $15}')",
+      "Bash(ipconfig getifaddr *)"
+    ]
+  },
   "enabledPlugins": {
     "expo@claude-plugins-official": true
   }
