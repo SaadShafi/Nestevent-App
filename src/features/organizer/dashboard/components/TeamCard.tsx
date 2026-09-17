@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { AppText, Avatar, Icon } from '@/components/ui';
 import type { TeamMember } from '@/data/types';
 import { haptic } from '@/lib/haptics';
-import { colors, radius } from '@/theme';
+import { colors } from '@/theme';
 
 type Props = { member: TeamMember; onEdit: () => void; onDelete: () => void };
 

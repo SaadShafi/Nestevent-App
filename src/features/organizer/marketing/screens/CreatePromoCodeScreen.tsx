@@ -50,13 +50,13 @@ export function CreatePromoCodeScreen() {
     if (!value.trim() || !/^\d+(\.\d{1,2})?$/.test(value.trim())) next.value = 'Enter a numeric discount value';
     else if (num <= 0) next.value = 'Discount must be greater than 0';
     else if (discountType === 'percentage' && num > 100) next.value = 'Percentage cannot exceed 100%';
-    if (usageLimit.trim() && !/^\d+$/.test(usageLimit.trim())) next.usageLimit = 'Enter a whole number';
-    if (perUserLimit.trim() && !/^\d+$/.test(perUserLimit.trim())) next.perUserLimit = 'Enter a whole number';
+    if (!/^\d+$/.test(usageLimit.trim()) || parseInt(usageLimit, 10) < 1) next.usageLimit = 'Enter a whole number of 1 or more';
+    if (!/^\d+$/.test(perUserLimit.trim()) || parseInt(perUserLimit, 10) < 1) next.perUserLimit = 'Enter a whole number of 1 or more';
     if (!starts) next.starts = 'Pick a start date';
     if (!expires) next.expires = 'Pick an expiry date';
     if (starts && expires && expires.getTime() <= starts.getTime()) next.expires = 'Expiry must be after the start date';
     setErrors(next);
-    if (Object.keys(next).length) {
+    if (Object.keys(next).length || !starts || !expires) {
       haptic.error();
       return;
     }
@@ -66,10 +66,10 @@ export function CreatePromoCodeScreen() {
       value: num,
       appliesTo: appliesLabel(appliesTo),
       eligible: appliesTo === 'all' ? 'All tickets' : (existing?.eligible ?? 'GA · VIP'),
-      usageLimit: parseInt(usageLimit, 10) || 0,
-      perUserLimit: parseInt(perUserLimit, 10) || 1,
-      starts: (starts ?? new Date()).toISOString(),
-      expires: (expires ?? new Date(Date.now() + 30 * 86400000)).toISOString(),
+      usageLimit: parseInt(usageLimit, 10),
+      perUserLimit: parseInt(perUserLimit, 10),
+      starts: starts.toISOString(),
+      expires: expires.toISOString(),
     };
     haptic.success();
     if (existing) {

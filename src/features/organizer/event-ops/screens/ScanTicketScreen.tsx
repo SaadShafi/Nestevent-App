@@ -83,10 +83,11 @@ export function ScanTicketScreen() {
   };
 
   const testScan = () => {
-    const next = soldTickets.find((t) => t.eventId === id && !t.scanned);
+    const forEvent = soldTickets.filter((t) => t.eventId === id);
+    const next = forEvent.find((t) => !t.scanned);
     if (!next) {
       haptic.error();
-      toast('Every ticket for this event is already scanned', 'info');
+      toast(forEvent.length ? 'Every ticket for this event is already scanned' : 'No tickets have been sold for this event yet', 'info');
       return;
     }
     handleScan(next.qrValue);

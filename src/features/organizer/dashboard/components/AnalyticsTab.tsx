@@ -6,6 +6,7 @@ import { BarChart } from '@/components/charts';
 import { AppText, Button, Icon, MCIcon, Select, StatCard } from '@/components/ui';
 import { useMyEvents } from '@/features/organizer/hooks';
 import { formatCompact, formatCurrency } from '@/lib/format';
+import { useOrganizerStore } from '@/store';
 import { colors, radius } from '@/theme';
 
 import { StatIcon } from '../../components/StatsRow';
@@ -24,23 +25,39 @@ const WEEK = [
 export function AnalyticsTab() {
   const router = useRouter();
   const events = useMyEvents();
+  const promos = useOrganizerStore((s) => s.promoCodes);
   const [eventId, setEventId] = useState<string | null>(null);
 
   const selected = events.find((e) => e.id === eventId);
   const options = useMemo(() => events.map((e) => ({ value: e.id, label: e.title })), [events]);
 
-  const stats = selected?.stats;
-  const revenue = stats ? formatCurrency(stats.revenue, { compact: true }) : '$24.5k';
-  const views = stats ? formatCompact(stats.pageVisits) : '211k';
-  const conversion = stats && stats.pageVisits > 0 ? `${((stats.ticketsSold / stats.pageVisits) * 100).toFixed(1)}%` : '3.8%';
-  const sales = stats ? formatCompact(stats.revenue) : '211k';
+  // One event when selected, otherwise the totals across all of the organizer's events.
+  const stats = useMemo(() => {
+    const source = selected ? [selected] : events;
+    return source.reduce(
+      (t, e) => ({
+        revenue: t.revenue + (e.stats?.revenue ?? 0),
+        ticketsSold: t.ticketsSold + (e.stats?.ticketsSold ?? 0),
+        pageVisits: t.pageVisits + (e.stats?.pageVisits ?? 0),
+      }),
+      { revenue: 0, ticketsSold: 0, pageVisits: 0 },
+    );
+  }, [selected, events]);
+  const revenue = formatCurrency(stats.revenue, { compact: true });
+  const views = formatCompact(stats.pageVisits);
+  const conversion = stats.pageVisits > 0 ? `${((stats.ticketsSold / stats.pageVisits) * 100).toFixed(1)}%` : '0%';
+  const sales = formatCurrency(stats.revenue, { compact: true });
+  const promoPerformance = formatCurrency(
+    promos.filter((p) => !selected || !p.eventId || p.eventId === selected.id).reduce((n, p) => n + p.revenue, 0),
+    { compact: true },
+  );
 
   return (
     <View style={styles.wrap}>
       <AppText variant="label" style={styles.label}>
         Individual Event Analytics
       </AppText>
-      <Select options={options} value={eventId} onChange={setEventId} placeholder="Select" sheetTitle="Select event" />
+      <Select options={options} value={eventId} onChange={setEventId} placeholder="All events" sheetTitle="Select event" />
 
       <View style={styles.stats}>
         <StatCard
@@ -91,7 +108,7 @@ export function AnalyticsTab() {
           <AppText variant="label" style={styles.tileTitle}>
             Promo Performance
           </AppText>
-          <AppText variant="h1">211k</AppText>
+          <AppText variant="h1">{promoPerformance}</AppText>
         </View>
       </View>
 

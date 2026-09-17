@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store';
 import { colors } from '@/theme';
 
 import { BecomeOrganizerCard } from '../components/BecomeOrganizerCard';
+import { DeleteAccountDialog } from '../components/DeleteAccountDialog';
 
 /** Settings: profile / password / push toggle / (organizer: wallet + bank) / delete account + Become Organizer card. */
 export function SettingsScreen() {
@@ -23,6 +24,7 @@ export function SettingsScreen() {
   const setRole = useAuthStore((s) => s.setRole);
 
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [passwordStep, setPasswordStep] = useState(false);
   const [confirmOrganizer, setConfirmOrganizer] = useState(false);
 
   const isOrganizer = role === 'organizer';
@@ -105,8 +107,10 @@ export function SettingsScreen() {
         message="Do you really want to delete these Account, you'll permanently lose your:"
         cancelLabel="Cancel"
         confirmLabel="Confirm"
-        onConfirm={onDelete}
+        onConfirm={() => setTimeout(() => setPasswordStep(true), 250)}
       />
+
+      <DeleteAccountDialog visible={passwordStep} onClose={() => setPasswordStep(false)} onConfirm={onDelete} />
 
       <ConfirmDialog
         visible={confirmOrganizer}

@@ -8,7 +8,7 @@ import { FigmaIcon } from '@/components/icons/FigmaIcon';
 import { Icon, StatCard } from '@/components/ui';
 import { LocationSheet } from '@/features/home/components/LocationSheet';
 import { useMyEvents } from '@/features/organizer/hooks';
-import { formatCompact } from '@/lib/format';
+import { formatCompact, formatCurrency } from '@/lib/format';
 import { useAuthStore, useChatStore, useOrganizerStore } from '@/store';
 import { colors } from '@/theme';
 
@@ -27,9 +27,9 @@ export function DashboardHeader() {
     const tickets = events.reduce((n, e) => n + (e.stats?.ticketsSold ?? 0), 0);
     const earnings = events.reduce((n, e) => n + (e.stats?.revenue ?? 0), 0);
     return {
-      events: events.length > 0 ? formatCompact(events.length) : '211',
-      tickets: tickets > 0 ? formatCompact(tickets) : '2.3k',
-      earnings: earnings > 0 ? formatCompact(earnings) : '211k',
+      events: formatCompact(events.length),
+      tickets: formatCompact(tickets),
+      earnings: formatCurrency(earnings, { compact: true }),
     };
   }, [events]);
 

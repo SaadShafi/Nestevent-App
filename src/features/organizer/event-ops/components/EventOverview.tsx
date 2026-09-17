@@ -1,9 +1,10 @@
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState, type ReactNode } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AttendeesSheet } from '@/components/AttendeesSheet';
 import { EventMap } from '@/components/EventMap';
 import { AppText, AvatarStack, Header, Icon, IconButton, Toggle } from '@/components/ui';
 import type { EventItem, Organization, TicketType } from '@/data/types';
@@ -37,12 +38,22 @@ type Props = {
 export function EventOverview({ event, org, headerTitle, headerRight, footer, onToggleAttendees, onEditTicket, children }: Props) {
   const insets = useSafeAreaInsets();
   const [showMap, setShowMap] = useState(true);
+  const [attendeesOpen, setAttendeesOpen] = useState(false);
+  // Once the hero scrolls away the overlay header gets a solid background so it doesn't collide with content.
+  const [scrolled, setScrolled] = useState(false);
   const avatars = event.attendeeAvatars.length ? event.attendeeAvatars : GUEST_AVATARS;
   const guests = event.attendees || 50;
 
   return (
     <View style={styles.root}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 + insets.bottom }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120 + insets.bottom }}
+        scrollEventThrottle={32}
+        onScroll={(e) => {
+          const past = e.nativeEvent.contentOffset.y > HERO_H - 120;
+          if (past !== scrolled) setScrolled(past);
+        }}>
         <View style={styles.hero}>
           <Image source={{ uri: event.cover }} style={StyleSheet.absoluteFill} contentFit="cover" blurRadius={22} transition={200} />
           <View style={[StyleSheet.absoluteFill, styles.scrim]} />
@@ -97,12 +108,20 @@ export function EventOverview({ event, org, headerTitle, headerRight, footer, on
           <AppText variant="h3" style={styles.sectionTitle}>
             Attendees
           </AppText>
-          <View style={styles.attendees}>
+          <Pressable
+            onPress={() => {
+              haptic.light();
+              setAttendeesOpen(true);
+            }}
+            style={styles.attendees}
+            accessibilityRole="button"
+            accessibilityLabel="View attendees">
             <AvatarStack uris={avatars} size={34} />
             <AppText variant="label" secondary>
               {guests} + Guests
             </AppText>
-          </View>
+            <Icon name="chevron-forward" size={16} color={colors.textMuted} />
+          </Pressable>
           <View style={styles.toggleRow}>
             <AppText variant="bodyMedium" style={styles.flex}>
               Show Attendees List to Public
@@ -150,11 +169,12 @@ export function EventOverview({ event, org, headerTitle, headerRight, footer, on
         </View>
       </ScrollView>
 
-      <View style={[styles.header, { top: insets.top }]}>
-        <Header overlay title={headerTitle} right={headerRight} />
+      <View style={[styles.header, { paddingTop: insets.top }, scrolled && styles.headerSolid]}>
+        <Header overlay title={headerTitle} right={headerRight} style={styles.headerRow} />
       </View>
 
       <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 12) }]}>{footer}</View>
+      <AttendeesSheet event={event} visible={attendeesOpen} onClose={() => setAttendeesOpen(false)} />
     </View>
   );
 }
@@ -195,7 +215,9 @@ const styles = StyleSheet.create({
   },
   addressRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
   map: { marginBottom: 8 },
-  header: { position: 'absolute', left: layout.screenPadding, right: layout.screenPadding },
+  header: { position: 'absolute', top: 0, left: 0, right: 0, paddingHorizontal: layout.screenPadding },
+  headerSolid: { backgroundColor: colors.bg, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.border },
+  headerRow: { marginBottom: 0 },
   footer: {
     position: 'absolute',
     left: 0,

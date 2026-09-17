@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
-import { useRef, useState, type ReactNode } from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { useState, type ReactNode } from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import { AppText, Button, Header, Icon, Input, MCIcon, Screen, Toggle } from '@/components/ui';
 import type { EventVisibility } from '@/data/types';
@@ -23,30 +23,26 @@ export function VisibilityScreen() {
   const visibility = useOrganizerStore((s) => s.draft.visibility);
   const password = useOrganizerStore((s) => s.draft.password);
   const setDraft = useOrganizerStore((s) => s.setDraft);
-  const inputRef = useRef<TextInput>(null);
-  const [editing, setEditing] = useState(!password);
   const [error, setError] = useState<string | undefined>();
 
   const select = (key: EventVisibility, on: boolean) => {
     haptic.selection();
     setDraft({ visibility: on ? key : 'public' });
     if (key !== 'password' || !on) setError(undefined);
-    if (key === 'password' && on) setTimeout(() => inputRef.current?.focus(), 250);
+    if (key === 'password' && on && !password) router.push('/organizer/create-event/password');
   };
 
   const next = () => {
     if (visibility === 'password' && !password.trim()) {
       haptic.error();
       setError('Password is required for a password-protected event');
-      setEditing(true);
-      setTimeout(() => inputRef.current?.focus(), 50);
+      router.push('/organizer/create-event/password');
       return;
     }
     if (visibility === 'password' && password.trim().length < 4) {
       haptic.error();
       setError('Use at least 4 characters');
-      setEditing(true);
-      setTimeout(() => inputRef.current?.focus(), 50);
+      router.push('/organizer/create-event/password');
       return;
     }
     setError(undefined);
@@ -74,11 +70,11 @@ export function VisibilityScreen() {
               <View style={styles.passwordBlock}>
                 <View style={styles.passwordRow}>
                   <Input
-                    ref={inputRef}
                     password
                     placeholder="Set a password"
                     value={password}
-                    editable={editing}
+                    editable={false}
+                    onPressField={() => router.push('/organizer/create-event/password')}
                     onChangeText={(t) => {
                       setDraft({ password: t });
                       if (error) setError(undefined);
@@ -87,17 +83,13 @@ export function VisibilityScreen() {
                     autoCapitalize="none"
                     containerStyle={[styles.flex, styles.noMargin]}
                     fieldStyle={styles.passwordField}
-                    onSubmitEditing={() => setEditing(false)}
                   />
                   <Button
-                    title={editing ? 'Done' : 'Edit'}
+                    title="Edit"
                     variant="outlinePrimary"
                     size="md"
                     fullWidth={false}
-                    onPress={() => {
-                      setEditing((e) => !e);
-                      if (!editing) setTimeout(() => inputRef.current?.focus(), 50);
-                    }}
+                    onPress={() => router.push('/organizer/create-event/password')}
                   />
                 </View>
                 <AppText variant="caption" secondary center style={styles.hint}>

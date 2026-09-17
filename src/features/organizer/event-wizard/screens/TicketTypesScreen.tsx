@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useIsFocused, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 
@@ -18,10 +18,13 @@ export function TicketTypesScreen() {
   const ticketTypes = useOrganizerStore((s) => s.draft.ticketTypes);
   const setDraft = useOrganizerStore((s) => s.setDraft);
   const [pendingRemove, setPendingRemove] = useState<TicketType | null>(null);
+  const isFocused = useIsFocused();
 
+  // Seed the hub only while this step is on screen. Review calls resetDraft() while this screen is
+  // still mounted underneath, and seeding then would hand the *next* draft three ticket types.
   useEffect(() => {
-    if (ticketTypes.length === 0) setDraft({ ticketTypes: defaultTicketTypes() });
-  }, [ticketTypes.length, setDraft]);
+    if (isFocused && ticketTypes.length === 0) setDraft({ ticketTypes: defaultTicketTypes() });
+  }, [isFocused, ticketTypes.length, setDraft]);
 
   const update = (tt: TicketType) => setDraft({ ticketTypes: ticketTypes.map((t) => (t.id === tt.id ? tt : t)) });
 

@@ -107,7 +107,7 @@ export function BoostStepScreen() {
       </View>
 
       <AppText variant="label" style={styles.paymentLabel}>
-        Order Summary
+        Payment Method
       </AppText>
       <Pressable onPress={() => setPaymentOpen(true)} style={({ pressed }) => [styles.paymentRow, pressed && styles.pressed]}>
         <View style={styles.paymentIcon}>{payment ? <PaymentBrandIcon brand={payment.brand} size={18} /> : null}</View>

@@ -114,8 +114,7 @@ function CheckoutBody() {
     });
     clearCart();
     haptic.success();
-    toast('Order placed — tickets are in My Tickets', 'success');
-    router.replace(`/event/${event.id}/ticket-order`);
+    router.replace(`/event/${event.id}/checkout-success`);
   };
 
   return (

@@ -3,7 +3,6 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { LocationPicker } from '@/components/LocationPicker';
 import { pickImages, ProfilePhotoPicker, UploadDropzone } from '@/components/PhotoPicker';
 import { SocialLinksEditor, type Socials } from '@/components/SocialLinksEditor';
 import { AppText, Button, Chip, Header, Icon, Input, PhoneInput, Screen, Select, useToast } from '@/components/ui';
@@ -17,6 +16,7 @@ import { isEmail, isPhone, required } from '@/lib/validation';
 import { useAuthStore, useEventsStore } from '@/store';
 import { colors, radius } from '@/theme';
 
+import { EventLocationPicker } from '../../shared/EventLocationPicker';
 import { WizardHeading } from '../../shared/WizardHeading';
 
 const TYPE_OPTIONS = ORG_TYPES.map((t) => ({ value: t, label: t }));
@@ -40,8 +40,9 @@ export function CreateOrganizationScreen() {
   const [description, setDescription] = useState(existing?.description ?? '');
   const [categories, setCategories] = useState<string[]>(existing?.categories ?? ['Promoter']);
   const [email, setEmail] = useState(existing?.email ?? '');
-  const [phone, setPhone] = useState(existing?.phone ?? '');
-  const [countryCode, setCountryCode] = useState('+1');
+  // Stored phones are "+1 555 123 4567"; split the dial code back out so saving doesn't double it.
+  const [phone, setPhone] = useState(existing?.phone.replace(/^\+\d+\s*/, '') ?? '');
+  const [countryCode, setCountryCode] = useState(existing?.phone.match(/^\+\d+/)?.[0] ?? '+1');
   const [socials, setSocials] = useState<Socials>(existing?.socials ?? {});
   const [country, setCountry] = useState(existing?.country ?? '');
   const [city, setCity] = useState(existing?.city ?? '');
@@ -204,7 +205,17 @@ export function CreateOrganizationScreen() {
         <Input label="Country" placeholder="Country" value={country} onChangeText={setCountry} containerStyle={styles.flex} />
         <Input label="City" placeholder="City" value={city} onChangeText={setCity} containerStyle={styles.flex} />
       </View>
-      <LocationPicker label="Location" value={location} onChangeText={setLocation} />
+      <EventLocationPicker
+        label="Location"
+        value={location}
+        onChangeText={setLocation}
+        onLocated={(a) => {
+          setLocation(a.label);
+          if (a.city) setCity(a.city);
+          if (a.country) setCountry(a.country);
+          if (a.zipcode) setZipcode(a.zipcode);
+        }}
+      />
       <Input label="Zipcode" placeholder="Enter" value={zipcode} onChangeText={setZipcode} keyboardType="number-pad" />
     </Screen>
   );

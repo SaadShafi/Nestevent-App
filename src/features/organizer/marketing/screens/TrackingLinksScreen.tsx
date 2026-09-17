@@ -22,35 +22,34 @@ export function TrackingLinksScreen() {
   const router = useRouter();
   const toast = useToast();
   const links = useOrganizerStore((s) => s.trackingLinks);
+  const removeTrackingLink = useOrganizerStore((s) => s.removeTrackingLink);
 
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<Sort>('recent');
-  const [hidden, setHidden] = useState<string[]>([]);
   const [moreFor, setMoreFor] = useState<TrackingLink | null>(null);
 
-  const visible = useMemo(() => links.filter((l) => !hidden.includes(l.id)), [links, hidden]);
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const list = q ? visible.filter((l) => l.campaign.toLowerCase().includes(q) || l.url.toLowerCase().includes(q)) : visible;
+    const list = q ? links.filter((l) => l.campaign.toLowerCase().includes(q) || l.url.toLowerCase().includes(q)) : links;
     return [...list].sort((a, b) =>
       sort === 'clicks' ? b.clicks - a.clicks : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
-  }, [visible, query, sort]);
+  }, [links, query, sort]);
 
   const totals = useMemo(
     () =>
-      visible.reduce(
+      links.reduce(
         (t, l) => ({ clicks: t.clicks + l.clicks, sales: t.sales + l.sales, revenue: t.revenue + l.revenue }),
         { clicks: 0, sales: 0, revenue: 0 },
       ),
-    [visible],
+    [links],
   );
   const conversion = totals.clicks > 0 ? `${((totals.sales / totals.clicks) * 100).toFixed(1)}%` : '0%';
 
   const end = new Date();
   const start = new Date();
   start.setDate(end.getDate() - 30);
-  const featured = filtered[0] ?? visible[0];
+  const featured = filtered[0] ?? links[0];
 
   const copy = async (l: TrackingLink) => {
     await Clipboard.setStringAsync(`https://${l.url}`);
@@ -128,7 +127,7 @@ export function TrackingLinksScreen() {
       <SearchBar placeholder="Search tracking link..." value={query} onChangeText={setQuery} containerStyle={styles.search} />
 
       <View style={styles.listHeader}>
-        <AppText variant="label">All Tracking Links {visible.length}</AppText>
+        <AppText variant="label">All Tracking Links {links.length}</AppText>
         <Pressable
           onPress={() => {
             haptic.selection();
@@ -175,11 +174,10 @@ export function TrackingLinksScreen() {
           onPress={() => {
             const l = moreFor;
             setMoreFor(null);
-            if (l) {
-              setHidden((h) => [...h, l.id]);
-              haptic.success();
-              toast('Tracking link deleted', 'success');
-            }
+            if (!l) return;
+            removeTrackingLink(l.id);
+            haptic.success();
+            toast('Tracking link deleted', 'success');
           }}
         />
       </BottomSheet>

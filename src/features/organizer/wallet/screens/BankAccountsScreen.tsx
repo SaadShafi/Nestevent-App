@@ -37,7 +37,7 @@ export function BankAccountsScreen() {
                 {b.holder}
               </AppText>
               <AppText variant="caption" secondary numberOfLines={1}>
-                {b.number}
+                {b.bankName ? `${b.bankName} · ` : ''}{b.number}
               </AppText>
             </View>
             {b.isDefault ? <View style={styles.dot} /> : <View style={styles.dotOff} />}

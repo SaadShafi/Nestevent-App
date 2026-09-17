@@ -26,11 +26,13 @@ export function TeamMemberCard({ member, onDelete, onPress }: Props) {
         </Pressable>
       </View>
       <View style={styles.contact}>
-        <View style={styles.contactItem}>
+        <View style={[styles.contactItem, styles.phone]}>
           <Icon name="call" size={13} color={colors.primary} />
-          <AppText variant="caption">{member.phone}</AppText>
+          <AppText variant="caption" numberOfLines={1}>
+            {member.phone}
+          </AppText>
         </View>
-        <View style={styles.contactItem}>
+        <View style={[styles.contactItem, styles.flex]}>
           <Icon name="mail" size={13} color={colors.primary} />
           <AppText variant="caption" numberOfLines={1} style={styles.flex}>
             {member.email}
@@ -48,5 +50,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   delete: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   contact: { flexDirection: 'row', alignItems: 'center', gap: 16, marginTop: 12 },
-  contactItem: { flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 1 },
+  contactItem: { flexDirection: 'row', alignItems: 'center', gap: 6, minWidth: 0 },
+  // Phone numbers never wrap; the email column absorbs the remaining width and truncates.
+  phone: { flexShrink: 0 },
 });

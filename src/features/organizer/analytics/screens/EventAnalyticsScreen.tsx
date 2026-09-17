@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { DonutChart, LineChart } from '@/components/charts';
-import { AppText, BottomSheet, Button, Card, EmptyState, Header, Icon, MCIcon, Screen, Select, StatCard } from '@/components/ui';
+import { AppText, BottomSheet, Button, Card, EmptyState, Header, Icon, Screen, Select, StatCard } from '@/components/ui';
 import { EventCard } from '@/components/EventCard';
 import { useEvent } from '@/hooks/useEvent';
 import { formatCurrency } from '@/lib/format';
@@ -12,12 +12,14 @@ import { colors, radius } from '@/theme';
 import { StatIcon } from '../../components/StatsRow';
 import { formatMonthRange, formatNumber } from '../../utils';
 
-const SALES = [3200, 4890, 4100, 2600, 3900, 2400, 2900, 4300, 3500, 2200, 4100, 4700];
+/** Monthly shape of the sales curve (share of the year's total per month). */
+const SALES_SHAPE = [0.076, 0.116, 0.097, 0.062, 0.093, 0.057, 0.069, 0.102, 0.083, 0.052, 0.097, 0.096];
 const SALES_LABELS = ['Jan', 'Mar', 'May', 'Jul'];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 type Order = 'order' | 'revenue' | 'tickets';
 const ORDER_OPTIONS: { value: Order; label: string }[] = [
-  { value: 'order', label: 'Order' },
+  { value: 'order', label: 'Orders' },
   { value: 'revenue', label: 'Revenue' },
   { value: 'tickets', label: 'Tickets' },
 ];
@@ -57,6 +59,13 @@ export function EventAnalyticsScreen() {
   const vip = Math.round(stats.revenue * 0.2);
   const early = stats.revenue - general - vip;
 
+  // Series for the line chart follows the selected metric; the lowest month is highlighted.
+  const seriesTotal = order === 'revenue' ? stats.revenue : order === 'tickets' ? stats.ticketsSold : Math.round(stats.ticketsSold / 2.1);
+  const series = SALES_SHAPE.map((share) => Math.round(seriesTotal * share));
+  const lowIndex = series.reduce((best, v, i) => (v < series[best] ? i : best), 0);
+  const lowValue = order === 'revenue' ? formatCurrency(series[lowIndex]) : formatNumber(series[lowIndex]);
+  const metricLabel = order === 'revenue' ? 'revenue' : order === 'tickets' ? 'ticket sales' : 'orders';
+
   return (
     <Screen scroll>
       <Header title="Event Analytics" />
@@ -82,7 +91,7 @@ export function EventAnalyticsScreen() {
           label="Tickets"
           icon={
             <StatIcon>
-              <Icon name="time-outline" size={15} color={colors.primary} />
+              <Icon name="ticket-outline" size={15} color={colors.primary} />
             </StatIcon>
           }
         />
@@ -91,20 +100,25 @@ export function EventAnalyticsScreen() {
           label="Page Visits"
           icon={
             <StatIcon>
-              <MCIcon name="briefcase-outline" size={15} color={colors.primary} />
+              <Icon name="eye-outline" size={15} color={colors.primary} />
             </StatIcon>
           }
         />
       </View>
 
-      <Select options={ORDER_OPTIONS} value={order} onChange={setOrder} sheetTitle="Sort by" />
+      <Select options={ORDER_OPTIONS} value={order} onChange={setOrder} sheetTitle="Chart metric" />
 
       <Card style={styles.card}>
         <AppText variant="h2">Sales Performance</AppText>
         <AppText variant="caption" secondary style={styles.cardCaption}>
           {formatMonthRange(start, end)}
         </AppText>
-        <LineChart values={SALES} labels={SALES_LABELS} highlightIndex={1} highlightLabel="4,890: Low sales in June" />
+        <LineChart
+          values={series}
+          labels={SALES_LABELS}
+          highlightIndex={lowIndex}
+          highlightLabel={`${lowValue}: Low ${metricLabel} in ${MONTHS[lowIndex]}`}
+        />
         <View style={styles.growth}>
           <AppText variant="h1" color={colors.primary}>
             30%

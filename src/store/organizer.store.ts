@@ -95,7 +95,9 @@ type OrganizerState = {
   addSmsBlast: (b: Omit<SmsBlast, 'id' | 'sentAt' | 'status'>) => void;
   addBoost: (b: Omit<Boost, 'id' | 'createdAt' | 'status'>) => void;
 
-  addBankAccount: (holder: string, number: string) => void;
+  addBankAccount: (holder: string, number: string, extra?: { bankName?: string; routing?: string; isDefault?: boolean }) => void;
+  removeBankAccount: (id: string) => void;
+  removeTrackingLink: (id: string) => void;
   setDefaultBank: (id: string) => void;
   requestDeposit: (amount: number) => void;
   withdraw: (amount: number) => void;
@@ -179,10 +181,23 @@ export const useOrganizerStore = create<OrganizerState>()(
       addBoost: (b) =>
         set((s) => ({ boosts: [{ ...b, id: uid('b'), createdAt: new Date().toISOString(), status: 'active' }, ...s.boosts] })),
 
-      addBankAccount: (holder, number) =>
-        set((s) => ({
-          bankAccounts: [...s.bankAccounts.map((b) => ({ ...b, isDefault: false })), { id: uid('ba'), holder, number, isDefault: true }],
-        })),
+      addBankAccount: (holder, number, extra) =>
+        set((s) => {
+          const makeDefault = extra?.isDefault ?? s.bankAccounts.length === 0;
+          return {
+            bankAccounts: [
+              ...s.bankAccounts.map((b) => (makeDefault ? { ...b, isDefault: false } : b)),
+              { id: uid('ba'), holder, number, bankName: extra?.bankName, routing: extra?.routing, isDefault: makeDefault },
+            ],
+          };
+        }),
+      removeBankAccount: (id) =>
+        set((s) => {
+          const rest = s.bankAccounts.filter((b) => b.id !== id);
+          if (rest.length && !rest.some((b) => b.isDefault)) rest[0] = { ...rest[0], isDefault: true };
+          return { bankAccounts: rest };
+        }),
+      removeTrackingLink: (id) => set((s) => ({ trackingLinks: s.trackingLinks.filter((l) => l.id !== id) })),
       setDefaultBank: (id) => set((s) => ({ bankAccounts: s.bankAccounts.map((b) => ({ ...b, isDefault: b.id === id })) })),
       requestDeposit: (amount) =>
         set((s) => ({

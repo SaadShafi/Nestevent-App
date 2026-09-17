@@ -9,7 +9,12 @@ export function OrganizationSuccessScreen() {
       title="Organization Successfully"
       message="Enjoy Events picked based on your interests and location"
       ctaLabel="Go to Home"
-      onCta={() => router.replace('/(organizer)/(tabs)/home')}
+      // Pop Create Organization + Team & Roles first so they don't linger under the tabs
+      // (onboarding has no tabs beneath them yet, so dismissTo would only push).
+      onCta={() => {
+        router.dismissAll();
+        router.replace('/(organizer)/(tabs)/home');
+      }}
     />
   );
 }

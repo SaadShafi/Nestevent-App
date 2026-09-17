@@ -33,6 +33,7 @@ export function CreateBoostScreen() {
   const [paymentId, setPaymentId] = useState(PLATFORM_PAYMENT_METHODS[0]?.id ?? 'pm_card');
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [errors, setErrors] = useState<{ event?: string; budget?: string }>({});
+  const clearError = (key: keyof typeof errors) => setErrors((e) => (e[key] ? { ...e, [key]: undefined } : e));
 
   const amount = parseMoney(budget);
   const days = parseInt(duration, 10) || 1;
@@ -43,7 +44,8 @@ export function CreateBoostScreen() {
   const submit = () => {
     const next: typeof errors = {};
     if (!eventId) next.event = 'Select an event to boost';
-    if (amount <= 0) next.budget = 'Enter a budget';
+    if (!/^\$?\d+(\.\d{1,2})?$/.test(budget.trim())) next.budget = 'Enter a numeric budget';
+    else if (amount <= 0) next.budget = 'Budget must be greater than 0';
     setErrors(next);
     if (Object.keys(next).length || !eventId) {
       haptic.error();
@@ -58,13 +60,26 @@ export function CreateBoostScreen() {
   return (
     <Screen scroll keyboard footer={<Button title="Boost payment" variant="white" onPress={submit} />}>
       <Header title="Create Boost Event" />
-      <Select label="Select Event" placeholder="Select event" options={eventOptions} value={eventId} onChange={setEventId} error={errors.event} />
+      <Select
+        label="Select Event"
+        placeholder="Select event"
+        options={eventOptions}
+        value={eventId}
+        onChange={(v) => {
+          setEventId(v);
+          clearError('event');
+        }}
+        error={errors.event}
+      />
       <Select label="Boost Duration" options={DURATIONS} value={duration} onChange={setDuration} />
       <Input
         label="Budget"
         placeholder="$150"
         value={budget}
-        onChangeText={setBudget}
+        onChangeText={(t) => {
+          setBudget(t);
+          clearError('budget');
+        }}
         keyboardType="decimal-pad"
         left={<AppText secondary>$</AppText>}
         error={errors.budget}
@@ -84,7 +99,7 @@ export function CreateBoostScreen() {
         </View>
 
         <AppText variant="h3" style={styles.paymentTitle}>
-          Order Summary
+          Payment Method
         </AppText>
         <Pressable onPress={() => setPaymentOpen(true)} style={({ pressed }) => [styles.payment, pressed && styles.pressed]}>
           <View style={styles.payIcon}>{payment ? <PaymentBrandIcon brand={payment.brand} size={18} /> : null}</View>

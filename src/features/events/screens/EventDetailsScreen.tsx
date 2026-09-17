@@ -6,6 +6,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { EventMap } from '@/components/EventMap';
+import { AttendeesSheet } from '@/components/AttendeesSheet';
 import { AppText, AvatarStack, Button, EmptyState, Header, Icon, IconButton, Screen, useToast } from '@/components/ui';
 import { useEvent, useOrganization } from '@/hooks/useEvent';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
@@ -35,6 +36,7 @@ export function EventDetailsScreen() {
   const [expanded, setExpanded] = useState(false);
   const [showMap, setShowMap] = useState(true);
   const [rsvped, setRsvped] = useState(false);
+  const [attendeesOpen, setAttendeesOpen] = useState(false);
 
   const lowestPrice = useMemo(() => {
     if (!event) return 0;
@@ -134,12 +136,20 @@ export function EventDetailsScreen() {
           <AppText variant="h3" style={styles.sectionTitle}>
             Attendees
           </AppText>
-          <View style={styles.attendees}>
+          <Pressable
+            onPress={() => {
+              haptic.light();
+              setAttendeesOpen(true);
+            }}
+            style={styles.attendees}
+            accessibilityRole="button"
+            accessibilityLabel="View attendees">
             <AvatarStack uris={event.attendeeAvatars} size={34} />
             <AppText variant="label" secondary>
               {event.attendees} + Guests
             </AppText>
-          </View>
+            <Icon name="chevron-forward" size={16} color={colors.textMuted} />
+          </Pressable>
 
           <AppText variant="h3" style={styles.sectionTitle}>
             Location
@@ -206,6 +216,7 @@ export function EventDetailsScreen() {
           </View>
         )}
       </View>
+      <AttendeesSheet event={event} visible={attendeesOpen} onClose={() => setAttendeesOpen(false)} />
     </View>
   );
 }

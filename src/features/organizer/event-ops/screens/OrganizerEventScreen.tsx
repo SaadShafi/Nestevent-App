@@ -72,10 +72,11 @@ export function OrganizerEventScreen() {
         org={org}
         headerTitle="View Event"
         headerRight={
+          // The header's right slot is 88pt wide: two 40pt buttons fit, a third would overlap the title.
+          // Delete lives in the footer.
           <>
-            <IconButton name="share-social-outline" backgroundColor={GLASS} onPress={share} accessibilityLabel="Share event" />
-            <IconButton name="create-outline" backgroundColor={GLASS} onPress={edit} accessibilityLabel="Edit event" />
-            <IconButton name="trash-outline" backgroundColor={GLASS} color={colors.danger} onPress={() => setConfirmDelete(true)} accessibilityLabel="Delete event" />
+            <IconButton name="share-social-outline" size={40} backgroundColor={GLASS} onPress={share} accessibilityLabel="Share event" />
+            <IconButton name="create-outline" size={40} backgroundColor={GLASS} onPress={edit} accessibilityLabel="Edit event" />
           </>
         }
         onToggleAttendees={(v) => upsertEvent({ ...event, showAttendeesPublic: v })}

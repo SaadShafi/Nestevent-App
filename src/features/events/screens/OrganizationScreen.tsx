@@ -53,6 +53,13 @@ export function OrganizationScreen() {
         <View style={styles.hero}>
           <Image source={{ uri: org.cover }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
           <LinearGradient colors={['rgba(0,0,0,0.5)', 'transparent', 'rgba(11,11,11,0.9)']} style={StyleSheet.absoluteFill} />
+          <View style={[styles.header, { top: insets.top }]}>
+            <Header
+          overlay
+          title="Details"
+          right={<IconButton name="share-social-outline" backgroundColor={GLASS} onPress={onShare} accessibilityLabel="Share" />}
+        />
+          </View>
         </View>
 
         <View style={styles.sheet}>
@@ -110,13 +117,6 @@ export function OrganizationScreen() {
         </View>
       </ScrollView>
 
-      <View style={[styles.header, { top: insets.top }]}>
-        <Header
-          overlay
-          title="Details"
-          right={<IconButton name="share-social-outline" backgroundColor={GLASS} onPress={onShare} accessibilityLabel="Share" />}
-        />
-      </View>
     </View>
   );
 }

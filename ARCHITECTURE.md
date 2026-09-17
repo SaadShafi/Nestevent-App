@@ -136,3 +136,11 @@ const { openDrawer, drawer } = useAppDrawer();
 - `SlideToAction` — slide-to-continue control (Select Role "Get Started").
 - `ListRow` has a fixed 56pt height so labels and toggles always sit on one line.
 - Chat attachments: `Message.attachment` (`image | video | file`) rendered by `MessageBubble`; pick with `pickMediaAttachment` / `captureAttachment` / `pickDocumentAttachment` from `@/components/AttachmentPicker` (expo-image-picker + expo-document-picker).
+
+## Screens added in the Figma gap pass (2026-09-18)
+
+- `AttendeesSheet` (`@/components/AttendeesSheet`) — two-column attendee grid with reaction emojis; opened from the "N + Guests" row on guest Event Details and the organizer EventOverview.
+- `/organizer/create-event/password` — "Set Event Password" step; Visibility's Password Protected row routes here (Edit button, or toggling on with no password).
+- `DeleteAccountDialog` (`features/settings/components`) — second step after "Are you Sure?": password + terms checkbox, red Delete Account.
+- `/organizer/organization/[id]` — organizer-facing Organization Details (cover, logo, Edit Profile, contact, stats, socials, team list, add member, View Refunds Request). The dashboard Organizations tile opens this; the guest-facing `/organization/[id]` is unchanged.
+- `/event/[id]/checkout-success` — "Checkout Successfully" (Figma frame `33:8569`, mis-named "Select Role" in the file). Place Order replaces the Checkout modal with this full-screen fade; Back to Home dismisses to the Home tab, View Ticket opens the newest ticket for the event. Reference PNG: `docs/design/checkout-success.png`.

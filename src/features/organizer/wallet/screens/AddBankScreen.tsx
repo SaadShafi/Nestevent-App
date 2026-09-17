@@ -1,11 +1,9 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
 
-import { AppText, Button, Header, Input, Screen, Toggle, useToast } from '@/components/ui';
+import { Button, Header, Input, ListRow, Screen, Toggle, useToast } from '@/components/ui';
 import { haptic } from '@/lib/haptics';
 import { useOrganizerStore } from '@/store';
-import { colors, radius } from '@/theme';
 
 /** Bank Accounts → Add Bank Details form. */
 export function AddBankScreen() {
@@ -13,7 +11,6 @@ export function AddBankScreen() {
   const toast = useToast();
   const bankAccounts = useOrganizerStore((s) => s.bankAccounts);
   const addBankAccount = useOrganizerStore((s) => s.addBankAccount);
-  const setDefaultBank = useOrganizerStore((s) => s.setDefaultBank);
 
   const [holder, setHolder] = useState('');
   const [bankName, setBankName] = useState('');
@@ -33,10 +30,7 @@ export function AddBankScreen() {
       haptic.error();
       return;
     }
-    // The store always marks a new account as default; restore the previous default when the toggle is off.
-    const previousDefault = bankAccounts.find((b) => b.isDefault);
-    addBankAccount(holder.trim(), number.replace(/\s+/g, '').toUpperCase());
-    if (!isDefault && previousDefault) setDefaultBank(previousDefault.id);
+    addBankAccount(holder.trim(), number.replace(/\s+/g, '').toUpperCase(), { bankName: bankName.trim(), routing: routing.trim(), isDefault });
     haptic.success();
     toast('Bank account saved', 'success');
     router.back();
@@ -65,35 +59,19 @@ export function AddBankScreen() {
         autoCorrect={false}
         error={errors.routing}
       />
-      <View style={styles.toggleRow}>
-        <View style={styles.flex}>
-          <AppText variant="bodyMedium">Set as default</AppText>
-          <AppText variant="caption" secondary>
-            Use this account for withdrawals
-          </AppText>
-        </View>
-        <Toggle
-          value={isDefault}
-          onValueChange={(v) => {
-            haptic.selection();
-            setIsDefault(v);
-          }}
-        />
-      </View>
+      <ListRow
+        title="Set as default"
+        subtitle="Use this account for withdrawals"
+        right={
+          <Toggle
+            value={isDefault}
+            onValueChange={(v) => {
+              haptic.selection();
+              setIsDefault(v);
+            }}
+          />
+        }
+      />
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  flex: { flex: 1 },
-  toggleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: colors.surface,
-    borderRadius: radius.pill,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    minHeight: 60,
-  },
-});

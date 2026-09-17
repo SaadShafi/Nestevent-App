@@ -297,7 +297,7 @@ export type Boost = {
   createdAt: string;
 };
 
-export type BankAccount = { id: string; holder: string; number: string; isDefault: boolean };
+export type BankAccount = { id: string; holder: string; number: string; bankName?: string; routing?: string; isDefault: boolean };
 
 export type Transaction = {
   id: string;

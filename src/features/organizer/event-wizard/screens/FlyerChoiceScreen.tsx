@@ -15,8 +15,15 @@ export function FlyerChoiceScreen() {
   const draft = useOrganizerStore((s) => s.draft);
   const setDraft = useOrganizerStore((s) => s.setDraft);
   const [visible, setVisible] = useState(true);
-  const [choice, setChoice] = useState<'upload' | 'ai'>(draft.flyerMode === 'ai' ? 'ai' : 'upload');
+  const [choice, setChoice] = useState<'keep' | 'upload' | 'ai'>(draft.flyer ? 'keep' : draft.flyerMode === 'ai' ? 'ai' : 'upload');
   const bg = draft.flyer ?? draft.photos[0];
+
+  // Edit flow (or coming back to this step): the draft already has a flyer, so let it through untouched.
+  const keep = () => {
+    setChoice('keep');
+    haptic.light();
+    router.replace('/organizer/create-event/visibility');
+  };
 
   const upload = async () => {
     setChoice('upload');
@@ -43,6 +50,16 @@ export function FlyerChoiceScreen() {
           router.back();
         }}
         title="Event Media & Flyer">
+        {draft.flyer ? (
+          <OptionCard
+            compact
+            filled
+            title="Keep current flyer"
+            icon={<Icon name="checkmark-circle-outline" size={20} color={colors.white} />}
+            selected={choice === 'keep'}
+            onPress={keep}
+          />
+        ) : null}
         <OptionCard
           compact
           filled

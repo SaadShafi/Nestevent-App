@@ -72,6 +72,7 @@ export default function RootLayout() {
               <Stack.Screen name="create-post/camera" options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }} />
               <Stack.Screen name="event/[id]/cart" options={{ presentation: 'modal' }} />
               <Stack.Screen name="event/[id]/checkout" options={{ presentation: 'modal' }} />
+              <Stack.Screen name="event/[id]/checkout-success" options={{ presentation: 'fullScreenModal', animation: 'fade', gestureEnabled: false }} />
               <Stack.Screen name="event/[id]/ticket-order" options={{ presentation: 'modal' }} />
               <Stack.Screen name="delivery-address" options={{ presentation: 'modal' }} />
               <Stack.Screen name="organizer/event/[id]/scan" options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }} />

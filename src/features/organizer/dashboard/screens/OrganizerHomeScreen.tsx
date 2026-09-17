@@ -71,7 +71,7 @@ export function OrganizerHomeScreen() {
               <OrganizationTile
                 key={o.id}
                 org={o}
-                onPress={() => router.push(`/organization/${o.id}`)}
+                onPress={() => router.push(`/organizer/organization/${o.id}`)}
                 onEdit={() => router.push(`/organizer/create-organization?id=${o.id}`)}
               />
             ))}

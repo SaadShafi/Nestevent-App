@@ -52,7 +52,7 @@ export function SmsBlastScreen() {
         ]}
       />
       <SegmentTabs variant="underline" items={TABS} value={tab} onChange={setTab} style={styles.tabs} />
-      <SearchBar iconRight placeholder="Seach your area" value={query} onChangeText={setQuery} containerStyle={styles.search} />
+      <SearchBar iconRight placeholder="Search SMS blasts" value={query} onChangeText={setQuery} containerStyle={styles.search} />
 
       {filtered.length === 0 ? (
         <EmptyState icon="mail-outline" title={`No ${tab} blasts`} message="Send a new SMS blast to your attendees." />

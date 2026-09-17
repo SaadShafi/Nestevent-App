@@ -54,7 +54,7 @@ export function BoostEventsScreen() {
         ]}
       />
       <SegmentTabs variant="underline" items={TABS} value={tab} onChange={setTab} style={styles.tabs} />
-      <SearchBar iconRight placeholder="Seach your area" value={query} onChangeText={setQuery} containerStyle={styles.search} />
+      <SearchBar iconRight placeholder="Search boosted events" value={query} onChangeText={setQuery} containerStyle={styles.search} />
 
       {rows.length === 0 ? (
         <EmptyState icon="flash-outline" title={`No ${tab} boosts`} message="Boost an event to get paid discovery priority." />
