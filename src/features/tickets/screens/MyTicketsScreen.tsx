@@ -5,7 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { EventCard } from '@/components/EventCard';
 import { TabHeader, useAppDrawer } from '@/components/navigation/AppDrawer';
 import { Button, EmptyState, IconButton, Screen, SegmentTabs } from '@/components/ui';
-import type { EventItem, Ticket } from '@/data/types';
+import type { EventItem } from '@/data/types';
 import { haptic } from '@/lib/haptics';
 import { useAuthStore, useEventsStore, useTicketsStore } from '@/store';
 
@@ -31,14 +31,14 @@ export function MyTicketsScreen() {
   const rows = useMemo(() => {
     const now = Date.now();
     const seen = new Set<string>();
-    const out: { event: EventItem; ticket: Ticket }[] = [];
+    const out: { event: EventItem }[] = [];
     myTickets.forEach((t) => {
       if (seen.has(t.eventId)) return;
       const event = events.find((e) => e.id === t.eventId);
       if (!event) return;
       seen.add(t.eventId);
       const upcoming = new Date(event.startDate).getTime() >= now;
-      if ((tab === 'upcoming') === upcoming) out.push({ event, ticket: t });
+      if ((tab === 'upcoming') === upcoming) out.push({ event });
     });
     return out;
   }, [myTickets, events, tab]);
@@ -79,13 +79,13 @@ export function MyTicketsScreen() {
           message={tab === 'upcoming' ? 'Grab a ticket from an event to see it here.' : 'Events you attended will show up here.'}
         />
       ) : (
-        rows.map(({ event, ticket }) => (
+        rows.map(({ event }) => (
           <EventCard
             key={event.id}
             event={event}
             onPress={() => {
               haptic.light();
-              router.push(`/ticket/${ticket.id}`);
+              router.push(`/event/${event.id}`);
             }}
           />
         ))

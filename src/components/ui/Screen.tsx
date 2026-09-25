@@ -1,9 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
-import { type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   StyleSheet,
   View,
@@ -11,6 +9,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+import { KeyboardAvoidingView, KeyboardAwareScrollView, KeyboardStickyView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets, type Edge } from 'react-native-safe-area-context';
 
 import { colors, layout } from '@/theme';
@@ -29,7 +28,7 @@ type ScreenProps = {
   glow?: boolean;
   /** Leave space at the bottom for the floating tab bar. */
   withTabBar?: boolean;
-  /** Wrap in KeyboardAvoidingView (iOS padding / Android height). */
+  /** Keep focused inputs and the footer above the keyboard (iOS + Android edge-to-edge). */
   keyboard?: boolean;
   style?: StyleProp<ViewStyle>;
   contentStyle?: StyleProp<ViewStyle>;
@@ -59,12 +58,16 @@ export function Screen({
   const padTop = edges.includes('top') ? insets.top : 0;
   const padBottom = edges.includes('bottom') ? Math.max(insets.bottom, 12) : 0;
   const tabSpace = withTabBar ? layout.tabBarHeight + layout.tabBarBottomOffset + insets.bottom + 16 : 0;
+  const [footerHeight, setFooterHeight] = useState(0);
+  const footerPadBottom = Math.max(insets.bottom, 12);
 
+  const ScrollComponent = keyboard ? KeyboardAwareScrollView : ScrollView;
   const inner = scroll ? (
-    <ScrollView
+    <ScrollComponent
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
       contentInsetAdjustmentBehavior="never"
+      {...(keyboard ? { bottomOffset: (footer ? footerHeight : 0) + 48 } : null)}
       {...scrollProps}
       contentContainerStyle={[
         padded && styles.padded,
@@ -73,25 +76,37 @@ export function Screen({
         scrollProps?.contentContainerStyle,
       ]}>
       {children}
-    </ScrollView>
+    </ScrollComponent>
   ) : (
     <View style={[styles.flex, padded && styles.padded, { paddingBottom: tabSpace }, contentStyle]}>{children}</View>
   );
 
-  const body = keyboard ? (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}>
+  const body = keyboard && scroll ? (
+    <>
       {header}
       {inner}
-      {footer ? <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 12) }]}>{footer}</View> : null}
+      {footer ? (
+        // Scroll screens: the scroll view makes room for the keyboard itself; the footer CTA rides on top of it.
+        <KeyboardStickyView offset={{ opened: footerPadBottom - 8 }}>
+          <View
+            onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}
+            style={[styles.footer, { paddingBottom: footerPadBottom }]}>
+            {footer}
+          </View>
+        </KeyboardStickyView>
+      ) : null}
+    </>
+  ) : keyboard ? (
+    <KeyboardAvoidingView style={styles.flex} behavior="padding">
+      {header}
+      {inner}
+      {footer ? <View style={[styles.footer, { paddingBottom: footerPadBottom }]}>{footer}</View> : null}
     </KeyboardAvoidingView>
   ) : (
     <>
       {header}
       {inner}
-      {footer ? <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 12) }]}>{footer}</View> : null}
+      {footer ? <View style={[styles.footer, { paddingBottom: footerPadBottom }]}>{footer}</View> : null}
     </>
   );
 

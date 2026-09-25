@@ -69,6 +69,6 @@ const styles = StyleSheet.create({
   },
   filled: { backgroundColor: colors.primary },
   active: { borderColor: colors.primary },
-  digit: { fontFamily: fonts.semibold, fontSize: 18, color: colors.white },
+  digit: { fontFamily: fonts.semibold, fontSize: 16, color: colors.white },
   hidden: { position: 'absolute', opacity: 0, width: 1, height: 1 },
 });

@@ -6,7 +6,7 @@ import { AppText, Button, Input, NestLogo, PhoneInput, Screen } from '@/componen
 import { haptic } from '@/lib/haptics';
 import { isEmail, isPhone, isStrongPassword, required } from '@/lib/validation';
 import { useAuthStore } from '@/store';
-import { colors } from '@/theme';
+import { colors, fonts } from '@/theme';
 
 import { AuthCard } from '../components/AuthCard';
 
@@ -68,7 +68,7 @@ export function RegisterScreen() {
       <View style={styles.logo}>
         <NestLogo size={44} />
       </View>
-      <AppText variant="displaySm" center style={styles.title}>
+      <AppText variant="heading" center numberOfLines={1} adjustsFontSizeToFit style={styles.title}>
         Sign Up To Create Account
       </AppText>
       <AppText variant="caption" center secondary style={styles.subtitle}>
@@ -78,6 +78,7 @@ export function RegisterScreen() {
       <AuthCard>
         <View style={styles.row}>
           <Input
+          dense
             label="First Name"
             placeholder="Enter"
             value={firstName}
@@ -94,6 +95,7 @@ export function RegisterScreen() {
             containerStyle={styles.half}
           />
           <Input
+          dense
             ref={lastRef}
             label="Last Name"
             placeholder="Enter"
@@ -112,6 +114,7 @@ export function RegisterScreen() {
           />
         </View>
         <Input
+          dense
           ref={emailRef}
           label="Email Address"
           placeholder="Enter Your Email"
@@ -130,6 +133,7 @@ export function RegisterScreen() {
           blurOnSubmit={false}
         />
         <PhoneInput
+          dense
           label="Phone Number"
           value={phone}
           onChangeText={(t) => {
@@ -143,6 +147,7 @@ export function RegisterScreen() {
           onSubmitEditing={() => passwordRef.current?.focus()}
         />
         <Input
+          dense
           ref={passwordRef}
           label="Password"
           placeholder="Enter Password"
@@ -159,6 +164,7 @@ export function RegisterScreen() {
           onSubmitEditing={() => confirmRef.current?.focus()}
         />
         <Input
+          dense
           ref={confirmRef}
           label="Confirm Password"
           placeholder="Confirm Password"
@@ -178,13 +184,13 @@ export function RegisterScreen() {
         <Button variant="white" title="Sign Up" onPress={submit} style={styles.cta} />
 
         <View style={styles.footer}>
-          <AppText variant="label" secondary>
+          <AppText variant="caption" secondary>
             I Already Have An Account{' '}
           </AppText>
           <Pressable
             onPress={() => (router.canGoBack() ? router.back() : router.replace('/(auth)/login'))}
             hitSlop={8}>
-            <AppText variant="label" color={colors.primary}>
+            <AppText variant="caption" color={colors.primary} style={styles.link}>
               Sign In
             </AppText>
           </Pressable>
@@ -203,5 +209,6 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: 12 },
   half: { flex: 1 },
   cta: { marginTop: 8 },
+  link: { fontFamily: fonts.semibold },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 16, paddingBottom: 4 },
 });

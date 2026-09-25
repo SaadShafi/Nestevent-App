@@ -26,7 +26,7 @@ type Props = Omit<InputProps, 'left' | 'keyboardType'> & {
 };
 
 /** Phone field with flag + dial code selector, matching the Figma "Phone Number" input. */
-export const PhoneInput = forwardRef<TextInput, Props>(function PhoneInput({ countryCode = '+1', onCountryChange, ...rest }, ref) {
+export const PhoneInput = forwardRef<TextInput, Props>(function PhoneInput({ countryCode = '+1', onCountryChange, dense, ...rest }, ref) {
   const [open, setOpen] = useState(false);
   const current = COUNTRY_CODES.find((c) => c.code === countryCode) ?? COUNTRY_CODES[0];
   return (
@@ -41,12 +41,13 @@ export const PhoneInput = forwardRef<TextInput, Props>(function PhoneInput({ cou
           <Pressable onPress={() => setOpen(true)} style={styles.prefix} hitSlop={6}>
             <AppText style={styles.flag}>{current.flag}</AppText>
             <Icon name="chevron-down" size={14} color={colors.textSecondary} />
-            <AppText variant="label" secondary>
+            <AppText variant={dense ? 'caption' : 'label'} secondary>
               {current.code}
             </AppText>
             <View style={styles.divider} />
           </Pressable>
         }
+        dense={dense}
         {...rest}
       />
       <BottomSheet visible={open} onClose={() => setOpen(false)} title="Country code">

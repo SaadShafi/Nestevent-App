@@ -11,13 +11,15 @@ type Props = {
   location?: string;
   onLocationPress?: () => void;
   right?: ReactNode;
+  /** Replaces the NEST mark (Search tab shows the drawer button there). */
+  left?: ReactNode;
 };
 
 /** Figma "Tab 2" header: white NEST mark + location column + round glass action buttons. */
-export function HomeHeaderBar({ caption, location, onLocationPress, right }: Props) {
+export function HomeHeaderBar({ caption, location, onLocationPress, right, left }: Props) {
   return (
     <View style={styles.row}>
-      <NestLogo variant="white" size={40} />
+      {left ?? <NestLogo variant="white" size={40} />}
       {location ? (
         <Pressable onPress={onLocationPress} style={styles.location} hitSlop={8} accessibilityRole="button" accessibilityLabel="Change location">
           <View style={styles.captionRow}>
@@ -41,10 +43,27 @@ export function HomeHeaderBar({ caption, location, onLocationPress, right }: Pro
   );
 }
 
-/** Round 40pt glass button with a white hairline ring, as used on the orange headers. */
-export function HeaderGlassButton({ children, onPress, badge, accessibilityLabel }: { children: ReactNode; onPress: () => void; badge?: boolean; accessibilityLabel: string }) {
+/** Round 40pt glass button with a white hairline ring, as used on the orange headers (`dark` on black screens). */
+export function HeaderGlassButton({
+  children,
+  onPress,
+  badge,
+  accessibilityLabel,
+  dark,
+}: {
+  children: ReactNode;
+  onPress: () => void;
+  badge?: boolean;
+  accessibilityLabel: string;
+  dark?: boolean;
+}) {
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={accessibilityLabel} hitSlop={6} style={({ pressed }) => [styles.glass, pressed && styles.pressed]}>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      hitSlop={6}
+      style={({ pressed }) => [styles.glass, dark && styles.glassDark, pressed && styles.pressed]}>
       {children}
       {badge ? <View style={styles.badge} /> : null}
     </Pressable>
@@ -69,6 +88,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  glassDark: { borderColor: 'rgba(255,255,255,0.25)', backgroundColor: '#070707' },
   pressed: { opacity: 0.7 },
   badge: { position: 'absolute', top: 9, right: 10, width: 6, height: 6, borderRadius: 3, backgroundColor: '#E01E2E' },
 });

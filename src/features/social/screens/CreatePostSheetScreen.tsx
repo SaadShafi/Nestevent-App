@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { BottomSheet, Icon, OptionCard } from '@/components/ui';
@@ -13,6 +13,15 @@ export function CreatePostSheetScreen() {
   const reset = useCreatePostStore((s) => s.reset);
   const [visible, setVisible] = useState(true);
   const [selected, setSelected] = useState<CreatePostMode>('post');
+  const [next, setNext] = useState<CreatePostMode | null>(null);
+
+  // Navigate only once the sheet's Modal is gone: replacing this route while the Modal is still
+  // presented swallows the navigation, which made the options need more than one tap.
+  useEffect(() => {
+    if (!next) return;
+    const t = setTimeout(() => router.replace(next === 'post' ? '/create-post/upload' : '/create-post/verified-event'), 60);
+    return () => clearTimeout(t);
+  }, [next, router]);
 
   const close = () => {
     setVisible(false);
@@ -21,9 +30,11 @@ export function CreatePostSheetScreen() {
   };
 
   const choose = (mode: CreatePostMode) => {
+    if (next) return;
     setSelected(mode);
     reset({ mode });
-    router.replace(mode === 'post' ? '/create-post/upload' : '/create-post/verified-event');
+    setVisible(false);
+    setNext(mode);
   };
 
   return (
@@ -34,6 +45,7 @@ export function CreatePostSheetScreen() {
           filled
           title="Post"
           icon={<Icon name="image-outline" size={22} color={colors.white} />}
+          checkColor={colors.success}
           selected={selected === 'post'}
           onPress={() => choose('post')}
         />
@@ -42,6 +54,7 @@ export function CreatePostSheetScreen() {
           filled
           title="Create verified event post"
           icon={<Icon name="bar-chart-outline" size={22} color={colors.white} />}
+          checkColor={colors.success}
           selected={selected === 'verified'}
           onPress={() => choose('verified')}
         />

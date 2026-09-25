@@ -46,7 +46,7 @@ export function SocialUploadScreen() {
       <AppText secondary style={styles.subtitle}>
         reader will be distracted by the readable content
       </AppText>
-      <Pressable onPress={pick} style={({ pressed }) => [styles.drop, { height: height * 0.55 }, pressed && styles.pressed]}>
+      <Pressable onPress={pick} style={({ pressed }) => [styles.drop, { maxHeight: height * 0.55 }, pressed && styles.pressed]}>
         <View style={styles.plus}>
           <Icon name="add" size={18} color={colors.black} />
         </View>
@@ -65,7 +65,10 @@ export default SocialUploadScreen;
 
 const styles = StyleSheet.create({
   subtitle: { marginTop: 6, marginBottom: 16, maxWidth: 300 },
+  // Fills the space above the footer (capped at 55% of the window) so it never slides under Open Camera.
   drop: {
+    flex: 1,
+    marginBottom: 8,
     borderWidth: 1.5,
     borderStyle: 'dashed',
     borderColor: colors.primary,

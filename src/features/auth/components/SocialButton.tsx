@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
-import { BrandIcon, Button, Icon } from '@/components/ui';
-import { colors } from '@/theme';
+import { AppText, BrandIcon, Button, Icon } from '@/components/ui';
+import { colors, typography } from '@/theme';
 
 type Provider = 'google' | 'apple';
 
@@ -42,15 +42,19 @@ export function SocialButton({ provider, onPress, glass, loading }: Props) {
       variant="surface"
       loading={loading}
       onPress={onPress}
-      title={isGoogle ? 'Continue with Google' : 'Continue with Apple'}
       left={isGoogle ? <GoogleG /> : <Icon name="logo-apple" size={20} color={colors.white} />}
-      style={[styles.btn, glass && styles.glass]}
-    />
+      style={[styles.btn, glass && styles.glass]}>
+      {/* Login card buttons use the Figma 13pt label; the onboarding glass buttons keep the button type. */}
+      <AppText style={[typography.button, !glass && styles.label]} numberOfLines={1}>
+        {isGoogle ? 'Continue with Google' : 'Continue with Apple'}
+      </AppText>
+    </Button>
   );
 }
 
 const styles = StyleSheet.create({
   btn: { marginBottom: 12 },
+  label: { fontSize: 13, lineHeight: 18 },
   glass: { backgroundColor: 'rgba(255,255,255,0.15)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)' },
   g: { overflow: 'hidden' },
   gRow: { flex: 1, flexDirection: 'row' },

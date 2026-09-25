@@ -57,7 +57,7 @@ export function ProfileSetupScreen() {
       edges={['top', 'bottom']}
       footer={<Button variant="white" title="Save & Continue" onPress={save} />}>
       <Header />
-      <AppText variant="display" style={styles.title}>
+      <AppText variant="display" numberOfLines={1} adjustsFontSizeToFit style={styles.title}>
         Profile Setup
       </AppText>
       <AppText secondary style={styles.subtitle}>

@@ -75,5 +75,5 @@ const styles = StyleSheet.create({
   },
   side: { width: 88, flexDirection: 'row', alignItems: 'center', gap: 8 },
   right: { justifyContent: 'flex-end' },
-  title: { flex: 1 },
+  title: { flex: 1, fontSize: 16, lineHeight: 22 },
 });

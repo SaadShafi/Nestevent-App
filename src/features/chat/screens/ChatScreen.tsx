@@ -2,14 +2,13 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
   StyleSheet,
   View,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
 } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { canPickDocuments, captureAttachment, pickDocumentAttachment, pickMediaAttachment } from '@/components/AttachmentPicker';
@@ -104,8 +103,9 @@ export function ChatScreen() {
       </View>
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={0}>
+        behavior="padding"
+        // Only the input bar's safe-area padding tucks under the keyboard; the usual 12pt gap stays.
+        keyboardVerticalOffset={-(Math.max(insets.bottom, 12) - 12)}>
         <View style={styles.flex}>
           <FlatList
             ref={listRef}

@@ -1,9 +1,15 @@
-import { useRouter } from 'expo-router';
 import { Linking, Platform, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import Constants from 'expo-constants';
 import MapView, { Marker, PROVIDER_DEFAULT, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { Icon } from '@/components/ui';
 import { colors, radius } from '@/theme';
+
+import { TileMap } from './TileMap';
+
+/** Google Maps on Android needs a real API key in app.json; without one its map renders blank. */
+const googleKey = Constants.expoConfig?.android?.config?.googleMaps?.apiKey ?? '';
+const USE_TILE_MAP = Platform.OS === 'android' && (!googleKey || googleKey.startsWith('YOUR_'));
 
 type Props = {
   coords: { latitude: number; longitude: number };
@@ -18,10 +24,10 @@ type Props = {
 
 /**
  * Map preview used on Event Details / Review Event.
- * iOS → Apple Maps (PROVIDER_DEFAULT), Android → Google Maps. Dark map style on Google.
+ * iOS → Apple Maps (PROVIDER_DEFAULT), Android → Google Maps (dark style), or a keyless tile map
+ * when no Google Maps key is configured.
  */
 export function EventMap({ coords, title, address, height = 150, style, interactive = false, onLocate }: Props) {
-  useRouter();
   const openDirections = () => {
     const label = encodeURIComponent(title ?? address ?? 'Event');
     const url = Platform.select({
@@ -34,23 +40,34 @@ export function EventMap({ coords, title, address, height = 150, style, interact
 
   return (
     <View style={[styles.wrap, { height }, style]}>
-      <MapView
-        style={StyleSheet.absoluteFill}
-        provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT}
-        initialRegion={{ ...coords, latitudeDelta: 0.02, longitudeDelta: 0.02 }}
-        scrollEnabled={interactive}
-        zoomEnabled={interactive}
-        rotateEnabled={false}
-        pitchEnabled={false}
-        toolbarEnabled={false}
-        userInterfaceStyle="dark"
-        customMapStyle={Platform.OS === 'android' ? DARK_MAP_STYLE : undefined}>
-        <Marker coordinate={coords} title={title} description={address}>
-          <View style={styles.pin}>
-            <Icon name="location" size={18} color={colors.white} />
+      {USE_TILE_MAP ? (
+        <>
+          <TileMap latitude={coords.latitude} longitude={coords.longitude} />
+          <View pointerEvents="none" style={styles.centerPin}>
+            <View style={styles.pin}>
+              <Icon name="location" size={18} color={colors.white} />
+            </View>
           </View>
-        </Marker>
-      </MapView>
+        </>
+      ) : (
+        <MapView
+          style={StyleSheet.absoluteFill}
+          provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT}
+          initialRegion={{ ...coords, latitudeDelta: 0.02, longitudeDelta: 0.02 }}
+          scrollEnabled={interactive}
+          zoomEnabled={interactive}
+          rotateEnabled={false}
+          pitchEnabled={false}
+          toolbarEnabled={false}
+          userInterfaceStyle="dark"
+          customMapStyle={Platform.OS === 'android' ? DARK_MAP_STYLE : undefined}>
+          <Marker coordinate={coords} title={title} description={address}>
+            <View style={styles.pin}>
+              <Icon name="location" size={18} color={colors.white} />
+            </View>
+          </Marker>
+        </MapView>
+      )}
       <Pressable onPress={onLocate ?? openDirections} style={styles.locate} accessibilityLabel="Open directions">
         <Icon name="navigate" size={16} color={colors.white} />
       </Pressable>
@@ -70,6 +87,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.white,
   },
+  centerPin: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' },
   locate: {
     position: 'absolute',
     right: 10,

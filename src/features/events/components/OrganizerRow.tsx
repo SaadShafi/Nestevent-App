@@ -20,18 +20,19 @@ export function OrganizerRow({ org }: { org: Organization }) {
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}>
       <Image source={{ uri: org.logo }} style={styles.logo} contentFit="cover" />
       <View style={styles.flex}>
-        <AppText variant="title">{org.name}</AppText>
+        <AppText variant="title" style={styles.name}>
+          {org.name}
+        </AppText>
         <View style={styles.rating}>
           <Icon name="star" size={13} color={colors.primary} />
-          <AppText variant="captionMedium" color={colors.primary}>
+          <AppText variant="captionMedium" secondary>
             {org.rating.toFixed(1)}
           </AppText>
-          <AppText variant="caption" secondary>
+          <AppText variant="caption" muted>
             ({formatCompact(org.ratingCount)}+)
           </AppText>
         </View>
       </View>
-      <Icon name="chevron-forward" size={18} color={colors.textMuted} />
     </Pressable>
   );
 }
@@ -40,6 +41,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
   pressed: { opacity: 0.8 },
   flex: { flex: 1 },
-  logo: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.surfaceHigh },
+  logo: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surfaceHigh },
+  name: { fontSize: 18, lineHeight: 22 },
   rating: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 },
 });

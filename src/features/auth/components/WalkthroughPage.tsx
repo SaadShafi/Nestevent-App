@@ -1,10 +1,10 @@
-import { Image } from 'expo-image';
+import { Image, type ImageSource } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/ui';
 
-export type WalkthroughSlide = { key: string; image: string; title: string; body: string };
+export type WalkthroughSlide = { key: string; image: ImageSource | number; title: string; body: string };
 
 type Props = { slide: WalkthroughSlide; width: number; height: number; bottomInset: number };
 
@@ -12,7 +12,7 @@ type Props = { slide: WalkthroughSlide; width: number; height: number; bottomIns
 export function WalkthroughPage({ slide, width, height, bottomInset }: Props) {
   return (
     <View style={{ width, height }}>
-      <Image source={{ uri: slide.image }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+      <Image source={slide.image} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
       <LinearGradient
         pointerEvents="none"
         colors={['transparent', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.92)']}

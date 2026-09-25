@@ -26,6 +26,12 @@ export function SlideToAction({ title = 'Get Started', onComplete, disabled }: P
   const maxRef = useRef(0);
   maxRef.current = maxX;
   const doneRef = useRef(false);
+  // The PanResponder is created once, so read the latest props through refs — otherwise it keeps the
+  // first render's onComplete (Select Role then always saved the initially selected role).
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+  const disabledRef = useRef(disabled);
+  disabledRef.current = disabled;
 
   const reset = () => {
     doneRef.current = false;
@@ -34,8 +40,8 @@ export function SlideToAction({ title = 'Get Started', onComplete, disabled }: P
 
   const pan = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => !disabled,
-      onMoveShouldSetPanResponder: (_, g) => !disabled && Math.abs(g.dx) > 4,
+      onStartShouldSetPanResponder: () => !disabledRef.current,
+      onMoveShouldSetPanResponder: (_, g) => !disabledRef.current && Math.abs(g.dx) > 4,
       onPanResponderGrant: () => haptic.light(),
       onPanResponderMove: (_, g) => {
         const nx = Math.min(Math.max(g.dx, 0), maxRef.current);
@@ -46,7 +52,7 @@ export function SlideToAction({ title = 'Get Started', onComplete, disabled }: P
           doneRef.current = true;
           Animated.timing(x, { toValue: maxRef.current, duration: 120, useNativeDriver: true }).start(() => {
             haptic.success();
-            onComplete();
+            onCompleteRef.current();
             setTimeout(reset, 600);
           });
         } else {

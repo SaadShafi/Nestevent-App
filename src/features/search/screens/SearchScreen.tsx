@@ -3,15 +3,19 @@ import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { EventCard } from '@/components/EventCard';
-import { AppText, Button, EmptyState, Header, Screen, SearchBar, SegmentTabs } from '@/components/ui';
+import { HeaderGlassButton, HomeHeaderBar } from '@/components/HomeHeaderBar';
+import { FigmaIcon } from '@/components/icons/FigmaIcon';
+import { useAppDrawer } from '@/components/navigation/AppDrawer';
+import { AppText, Button, EmptyState, Header, Icon, Screen, SearchBar, SegmentTabs } from '@/components/ui';
 import { USERS, findUser } from '@/data/mock';
 import type { EventItem, Organization, User } from '@/data/types';
 import { formatCompact } from '@/lib/format';
 import { haptic } from '@/lib/haptics';
 import { DEFAULT_COORDS, distanceKm } from '@/lib/location';
-import { useAuthStore, useEventsStore } from '@/store';
+import { useAuthStore, useChatStore, useEventsStore } from '@/store';
+import { colors, fonts } from '@/theme';
 
-import { tabPath } from '../../home/utils';
+import { LocationSheet } from '../../home/components/LocationSheet';
 import { OrgCard } from '../components/OrgCard';
 import { UserRow, type SearchPerson } from '../components/UserRow';
 
@@ -61,14 +65,19 @@ export function SearchScreen() {
   const filters = useEventsStore((s) => s.filters);
   const resetFilters = useEventsStore((s) => s.resetFilters);
   const myCoords = useAuthStore((s) => s.coords);
+  const locationLabel = useAuthStore((s) => s.locationLabel);
+  const hasUnread = useChatStore((s) => s.notifications.some((n) => !n.read));
+  const { openDrawer, drawer } = useAppDrawer();
+  const [locationOpen, setLocationOpen] = useState(false);
 
   const fromFilter = params.results === '1';
   const [query, setQuery] = useState(params.q ?? '');
   const [chip, setChip] = useState<Chip>(() => {
     if (fromFilter) return filters.category;
-    return isQuick(params.filter) ? params.filter : '';
+    return isQuick(params.filter) ? params.filter : 'Events';
   });
   const [applyFilters, setApplyFilters] = useState(fromFilter);
+  const [searchFocused, setSearchFocused] = useState(false);
 
   // Re-sync when navigated to again with different params (tab screens stay mounted).
   useEffect(() => {
@@ -84,7 +93,8 @@ export function SearchScreen() {
   }, [params.q, params.filter, params.results]);
 
   const q = query.trim().toLowerCase();
-  const showRecent = q.length === 0 && chip === '';
+  // Opening the tab lands on Quick filters; recent searches show while the empty search field is focused.
+  const showRecent = searchFocused && q.length === 0 && !applyFilters;
   const active: Quick = chip === '' ? 'Events' : chip;
 
   const orgName = (id: string) => organizations.find((o) => o.id === id)?.name;
@@ -151,14 +161,7 @@ export function SearchScreen() {
     haptic.selection();
     resetFilters();
     setApplyFilters(false);
-    setChip('');
-  };
-
-  const goBack = () => {
-    // "Filter Result" is a mode of the Search tab, not a pushed screen: back returns to plain search.
-    if (applyFilters) return clearFilters();
-    if (router.canGoBack()) router.back();
-    else router.replace(tabPath('home'));
+    setChip('Events');
   };
 
   const filterSummary = [
@@ -205,13 +208,36 @@ export function SearchScreen() {
 
   return (
     <Screen withTabBar scroll glow={showRecent || active === 'Users'}>
-      <Header title={applyFilters ? 'Filter Result' : 'Search'} onBack={goBack} />
+      {applyFilters ? (
+        // "Filter Result" is a mode of the Search tab, not a pushed screen: back returns to plain search.
+        <Header title="Filter Result" onBack={clearFilters} />
+      ) : (
+        // Figma Search tab: drawer button + location + bell (same bar as Home, on black).
+        <View style={styles.topBar}>
+          <HomeHeaderBar
+            caption="You location"
+            location={locationLabel}
+            onLocationPress={() => setLocationOpen(true)}
+            left={
+              <HeaderGlassButton dark onPress={openDrawer} accessibilityLabel="Open menu">
+                <Icon name="menu-outline" size={22} color={colors.white} />
+              </HeaderGlassButton>
+            }
+            right={
+              <HeaderGlassButton dark onPress={() => router.push('/notifications')} accessibilityLabel="Notifications" badge={hasUnread}>
+                <FigmaIcon name="bell" size={20} color={colors.white} />
+              </HeaderGlassButton>
+            }
+          />
+        </View>
+      )}
       {!applyFilters ? (
         <SearchBar
           placeholder="Events, organizations or users"
           value={query}
           onChangeText={setQuery}
-          autoFocus={params.q === ''}
+          onFocus={() => setSearchFocused(true)}
+          onBlur={() => setSearchFocused(false)}
           onFilterPress={() => router.push('/filter')}
         />
       ) : null}
@@ -231,7 +257,7 @@ export function SearchScreen() {
         <>
           {!applyFilters ? (
             <>
-              <AppText variant="h3" style={styles.label}>
+              <AppText style={[styles.label, styles.quickLabel]}>
                 Quick filters
               </AppText>
               <SegmentTabs
@@ -258,12 +284,16 @@ export function SearchScreen() {
           {renderResults()}
         </>
       )}
+      <LocationSheet visible={locationOpen} onClose={() => setLocationOpen(false)} />
+      {drawer}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  topBar: { marginTop: 8, marginBottom: 20 },
   label: { marginTop: 20, marginBottom: 12 },
+  quickLabel: { fontFamily: fonts.regular, fontSize: 16, lineHeight: 22 },
   tabs: { paddingBottom: 20 },
   flex: { flex: 1 },
   filterBar: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4, marginBottom: 16 },

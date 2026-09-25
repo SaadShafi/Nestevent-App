@@ -3,6 +3,7 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import {
   Animated,
   Dimensions,
+  KeyboardAvoidingView,
   Modal,
   PanResponder,
   Platform,
@@ -95,7 +96,9 @@ export function BottomSheet({
 
   return (
     <Modal visible={visible} transparent animationType="none" onRequestClose={close} statusBarTranslucent>
-      <View style={styles.root}>
+      {/* Sheets with inputs (report reason, ticket code…) ride above the keyboard. Android's modal
+          window already resizes for the keyboard, so only iOS needs the padding. */}
+      <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined} enabled={Platform.OS === 'ios'}>
         <Animated.View style={[StyleSheet.absoluteFill, { opacity: backdrop }]}>
           {Platform.OS === 'ios' ? (
             <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
@@ -127,7 +130,7 @@ export function BottomSheet({
             {scroll ? children : <View style={[styles.content, contentStyle]}>{children}</View>}
           </Body>
         </Animated.View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -136,6 +139,8 @@ const styles = StyleSheet.create({
   root: { flex: 1, justifyContent: 'flex-end' },
   dim: { backgroundColor: 'rgba(0,0,0,0.55)' },
   sheet: {
+    // Lets scrollable sheets shrink instead of overflowing the top when the keyboard is up.
+    flexShrink: 1,
     backgroundColor: colors.bgElevated,
     borderTopLeftRadius: radius.xxl,
     borderTopRightRadius: radius.xxl,

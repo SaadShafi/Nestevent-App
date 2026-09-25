@@ -60,8 +60,6 @@ export const IMG = {
   feedWoman: u('photo-1516450360452-9312f5e86fc7', 1000),
   feedDinner: u('photo-1414235077428-338989a2e8c0', 1000),
   feedFriends: u('photo-1529156069898-49953e39b3ac', 1000),
-
-  supportIllustration: u('photo-1553877522-43269d4ea984', 600),
 } as const;
 
 export const avatar = (n: number) => `https://i.pravatar.cc/150?img=${((n - 1) % 70) + 1}`;

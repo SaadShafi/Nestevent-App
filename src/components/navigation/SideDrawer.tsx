@@ -1,29 +1,44 @@
-import { useRouter } from 'expo-router';
-import { useEffect, useRef } from 'react';
-import { Animated, Dimensions, Modal, Pressable, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from "expo-router";
+import { useEffect, useRef } from "react";
+import {
+  Animated,
+  Dimensions,
+  Modal,
+  Pressable,
+  StyleSheet,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { AppText, Button, Icon, IconButton, NestLogo, type IoniconName } from '@/components/ui';
-import { useAuthStore } from '@/store';
-import { colors, radius } from '@/theme';
+import {
+  AppText,
+  Button,
+  Icon,
+  IconButton,
+  NestLogo,
+} from "@/components/ui";
+import { useAuthStore } from "@/store";
+import { colors, fonts, radius } from "@/theme";
 
-type Item = { label: string; icon: IoniconName; href: string };
+import { DrawerIcon, type DrawerIconName } from "./DrawerIcon";
+
+type Item = { label: string; icon: DrawerIconName; href: string };
 
 /** Drawer entries; Dashboard / Profile resolve to the current role's tab group. */
 function menuItems(role: string | null): Item[] {
-  const tabs = role === 'organizer' ? '/(organizer)/(tabs)' : '/(guest)/(tabs)';
+  const tabs = role === "organizer" ? "/(organizer)/(tabs)" : "/(guest)/(tabs)";
   return [
-    { label: 'Dashboard', icon: 'grid-outline', href: `${tabs}/home` },
-    { label: 'Support', icon: 'headset-outline', href: '/settings/support' },
-    { label: 'Setting', icon: 'settings-outline', href: '/settings' },
-    { label: 'Terms & Condition', icon: 'document-text-outline', href: '/settings/terms' },
-    { label: 'Privacy Policy', icon: 'shield-checkmark-outline', href: '/settings/privacy' },
-    { label: "FAQ's", icon: 'help-circle-outline', href: '/settings/faq' },
-    { label: 'Profile', icon: 'person-outline', href: `${tabs}/profile` },
+    { label: "Dashboard", icon: "dashboard", href: `${tabs}/home` },
+    { label: "Support", icon: "support", href: "/settings/support" },
+    { label: "Setting", icon: "setting", href: "/settings" },
+    { label: "Terms & Condition", icon: "terms", href: "/settings/terms" },
+    { label: "Privacy Policy", icon: "privacy", href: "/settings/privacy" },
+    { label: "FAQ's", icon: "faq", href: "/settings/faq" },
+    { label: "Profile", icon: "profile", href: `${tabs}/profile` },
   ];
 }
 
-const W = Dimensions.get('window').width;
+const W = Dimensions.get("window").width;
 const DRAWER_W = Math.min(W * 0.62, 280);
 
 type Props = { visible: boolean; onClose: () => void; onLogout: () => void };
@@ -40,8 +55,17 @@ export function SideDrawer({ visible, onClose, onLogout }: Props) {
   useEffect(() => {
     if (visible) {
       Animated.parallel([
-        Animated.spring(x, { toValue: 0, useNativeDriver: true, damping: 20, stiffness: 200 }),
-        Animated.timing(fade, { toValue: 1, duration: 200, useNativeDriver: true }),
+        Animated.spring(x, {
+          toValue: 0,
+          useNativeDriver: true,
+          damping: 20,
+          stiffness: 200,
+        }),
+        Animated.timing(fade, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
       ]).start();
     } else {
       x.setValue(-DRAWER_W);
@@ -51,8 +75,16 @@ export function SideDrawer({ visible, onClose, onLogout }: Props) {
 
   const close = (cb?: () => void) => {
     Animated.parallel([
-      Animated.timing(x, { toValue: -DRAWER_W, duration: 200, useNativeDriver: true }),
-      Animated.timing(fade, { toValue: 0, duration: 200, useNativeDriver: true }),
+      Animated.timing(x, {
+        toValue: -DRAWER_W,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fade, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
     ]).start(() => {
       onClose();
       cb?.();
@@ -60,23 +92,44 @@ export function SideDrawer({ visible, onClose, onLogout }: Props) {
   };
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={() => close()} statusBarTranslucent>
-      <Animated.View style={[StyleSheet.absoluteFill, styles.dim, { opacity: fade }]}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="none"
+      onRequestClose={() => close()}
+      statusBarTranslucent
+    >
+      <Animated.View
+        style={[StyleSheet.absoluteFill, styles.dim, { opacity: fade }]}
+      >
         <Pressable style={StyleSheet.absoluteFill} onPress={() => close()} />
       </Animated.View>
-      <Animated.View style={[styles.drawer, { width: DRAWER_W, paddingTop: insets.top + 12, paddingBottom: insets.bottom + 16, transform: [{ translateX: x }] }]}>
-        <IconButton name="close" onPress={() => close()} accessibilityLabel="Close menu" />
-        <NestLogo size={40} style={styles.logo} />
-        <AppText variant="displaySm" style={styles.welcome}>
-          Welcome{'\n'}To Inspired
-        </AppText>
+      <Animated.View
+        style={[
+          styles.drawer,
+          {
+            width: DRAWER_W,
+            paddingTop: insets.top + 12,
+            paddingBottom: insets.bottom + 16,
+            transform: [{ translateX: x }],
+          },
+        ]}
+      >
+        <IconButton
+          name="close"
+          onPress={() => close()}
+          accessibilityLabel="Close menu"
+        />
+        <NestLogo size={80} style={styles.logo} />
+        <AppText style={styles.welcome}>Welcome{"\n"}To Inspired</AppText>
         <View style={styles.items}>
           {items.map((it) => (
             <Pressable
               key={it.label}
               onPress={() => close(() => router.push(it.href as never))}
-              style={({ pressed }) => [styles.item, pressed && styles.pressed]}>
-              <Icon name={it.icon} size={18} color={colors.text} />
+              style={({ pressed }) => [styles.item, pressed && styles.pressed]}
+            >
+              <DrawerIcon name={it.icon} size={20} />
               <AppText variant="bodyMedium">{it.label}</AppText>
             </Pressable>
           ))}
@@ -96,9 +149,9 @@ export function SideDrawer({ visible, onClose, onLogout }: Props) {
 }
 
 const styles = StyleSheet.create({
-  dim: { backgroundColor: 'rgba(0,0,0,0.55)' },
+  dim: { backgroundColor: "rgba(0,0,0,0.55)" },
   drawer: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     top: 0,
     bottom: 0,
@@ -108,10 +161,24 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: radius.xxl,
   },
   logo: { marginTop: 24 },
-  welcome: { marginTop: 8, marginBottom: 24, fontSize: 26, lineHeight: 32 },
+  // Figma: Gilroy Regular 30/38, #FCFCFC. Gilroy isn't bundled — Outfit is the app's closest geometric match.
+  welcome: {
+    marginTop: 8,
+    marginBottom: 24,
+    fontFamily: fonts.regular,
+    fontSize: 30,
+    lineHeight: 38,
+    letterSpacing: 0,
+    color: "#FCFCFC",
+  },
   items: { gap: 4 },
-  item: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 12 },
+  item: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    paddingVertical: 12,
+  },
   pressed: { opacity: 0.7 },
   flex: { flex: 1 },
-  logout: { alignSelf: 'stretch' },
+  logout: { alignSelf: "stretch" },
 });

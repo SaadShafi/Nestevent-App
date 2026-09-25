@@ -4,10 +4,10 @@ import { AppText, Icon } from '@/components/ui';
 import { haptic } from '@/lib/haptics';
 import { colors } from '@/theme';
 
-type Props = { checked: boolean; onChange: (v: boolean) => void; label?: string };
+type Props = { checked: boolean; onChange: (v: boolean) => void; label?: string; dense?: boolean };
 
 /** Small orange square checkbox ("Remember me"). */
-export function Checkbox({ checked, onChange, label }: Props) {
+export function Checkbox({ checked, onChange, label, dense }: Props) {
   return (
     <Pressable
       accessibilityRole="checkbox"
@@ -21,7 +21,7 @@ export function Checkbox({ checked, onChange, label }: Props) {
       <View style={[styles.box, checked && styles.checked]}>
         {checked ? <Icon name="checkmark" size={13} color={colors.white} /> : null}
       </View>
-      {label ? <AppText variant="label">{label}</AppText> : null}
+      {label ? <AppText variant={dense ? 'caption' : 'label'}>{label}</AppText> : null}
     </Pressable>
   );
 }

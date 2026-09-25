@@ -73,15 +73,21 @@ export const radius = {
 export const fonts = {
   display: 'Syne_800ExtraBold',
   displayBold: 'Syne_700Bold',
+  light: 'Outfit_300Light',
   regular: 'Outfit_400Regular',
   medium: 'Outfit_500Medium',
   semibold: 'Outfit_600SemiBold',
   bold: 'Outfit_700Bold',
 } as const;
 
+/** Figma screen headings are Syne Bold with -3% letter spacing. */
+const HEADING_TRACKING = -0.03;
+
 export const typography = {
-  display: { fontFamily: fonts.display, fontSize: 34, lineHeight: 40 },
-  displaySm: { fontFamily: fonts.display, fontSize: 28, lineHeight: 34 },
+  display: { fontFamily: fonts.displayBold, fontSize: 34, lineHeight: 40, letterSpacing: 34 * HEADING_TRACKING },
+  displaySm: { fontFamily: fonts.displayBold, fontSize: 28, lineHeight: 34, letterSpacing: 28 * HEADING_TRACKING },
+  /** Auth screen headings (Sign in / Sign Up / OTP). */
+  heading: { fontFamily: fonts.displayBold, fontSize: 22, lineHeight: 30, letterSpacing: 22 * HEADING_TRACKING },
   h1: { fontFamily: fonts.bold, fontSize: 24, lineHeight: 30 },
   h2: { fontFamily: fonts.semibold, fontSize: 20, lineHeight: 26 },
   h3: { fontFamily: fonts.semibold, fontSize: 17, lineHeight: 22 },

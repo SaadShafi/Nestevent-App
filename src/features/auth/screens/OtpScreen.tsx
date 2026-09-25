@@ -50,10 +50,10 @@ export function OtpScreen() {
       edges={['top', 'bottom']}
       footer={<Button variant="white" title="Continue" onPress={submit} disabled={!ready} />}>
       <Header title="Enter The Code" />
-      <AppText variant="displaySm" center style={styles.title}>
-        We have sent you a verification code to
+      <AppText variant="heading" center style={styles.title}>
+        We have sent you a{'\n'}verification code to
       </AppText>
-      <AppText variant="label" center secondary style={styles.target}>
+      <AppText variant="caption" center secondary style={styles.target}>
         {isReset ? 'Phone Number' : 'Email Address'}: {target}
       </AppText>
 

@@ -1,14 +1,15 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { EventCard } from '@/components/EventCard';
-import { AppText, Avatar, Button, EmptyState, Header, Icon, Screen } from '@/components/ui';
+import { AppText, Avatar, EmptyState, Header, Icon, Screen } from '@/components/ui';
 import { IMG } from '@/data/images';
 import { findUser } from '@/data/mock';
 import { haptic } from '@/lib/haptics';
 import { useAuthStore, useChatStore, useEventsStore, useSocialStore } from '@/store';
-import { colors, radius } from '@/theme';
+import { colors, fonts, radius } from '@/theme';
 
 import { PostGrid } from '../components/PostGrid';
 import { ProfileHero } from '../components/ProfileHero';
@@ -47,6 +48,24 @@ function HalfTabs({ value, onChange }: { value: Tab; onChange: (t: Tab) => void 
   );
 }
 
+/** Figma Follow / Message pill: flat orange, or the darker orange gradient once following. */
+function ActionPill({ label, onPress, gradient }: { label: string; onPress: () => void; gradient?: boolean }) {
+  return (
+    <Pressable
+      onPress={() => {
+        haptic.light();
+        onPress();
+      }}
+      accessibilityRole="button"
+      style={({ pressed }) => [styles.pill, pressed && styles.pressed]}>
+      {gradient ? <LinearGradient colors={['#FB8100', '#DC4600']} style={StyleSheet.absoluteFill} /> : null}
+      <AppText numberOfLines={1} style={styles.pillText}>
+        {label}
+      </AppText>
+    </Pressable>
+  );
+}
+
 function Stars({ rating }: { rating: number }) {
   return (
     <View style={styles.stars}>
@@ -60,7 +79,7 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-/** Another user's profile (organizer → Posts/Events tabs; plain user → posts only). */
+/** Another user's profile: Follow / Message beside the counts, then Posts / Events tabs. */
 export function UserDetailsScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -98,7 +117,7 @@ export function UserDetailsScreen() {
 
   return (
     <Screen padded={false} scroll edges={[]}>
-      <ProfileHero cover={user.cover ?? IMG.coverStage} height={240} overlay={overlay}>
+      <ProfileHero cover={user.cover ?? IMG.coverStage} height={240} overlay={overlay} wave>
         <View style={styles.identity}>
           <Avatar uri={user.avatar} size={64} />
           <View style={styles.identityText}>
@@ -131,42 +150,31 @@ export function UserDetailsScreen() {
 
         <SocialIconRow user={user} />
 
-        <StatsRow posts={user.posts} followers={user.followers} following={user.following} />
-        <View style={styles.actions}>
-          <Button
-            title={isFollowing ? 'Following' : 'Follow'}
-            variant={isFollowing ? 'primary' : 'outlinePrimary'}
-            size="md"
-            onPress={onFollow}
-            style={styles.pill}
-          />
-          <Button
-            title="Message"
-            size="md"
-            variant={isFollowing ? 'outlinePrimary' : 'primary'}
-            left={<Icon name="chatbubble-ellipses-outline" size={16} color={colors.white} />}
-            onPress={onMessage}
-            style={styles.pill}
-          />
-        </View>
+        <StatsRow
+          posts={user.posts}
+          followers={user.followers}
+          following={user.following}
+          statsGap={20}
+          style={styles.statsCard}
+          action={
+            <View style={styles.actions}>
+              <ActionPill label={isFollowing ? 'Following' : 'Follow'} gradient={isFollowing} onPress={onFollow} />
+              <ActionPill label="Message" onPress={onMessage} />
+            </View>
+          }
+        />
 
-        {user.role === 'organizer' ? (
-          <>
-            <HalfTabs value={tab} onChange={setTab} />
-            {tab === 'posts' ? (
-              <PostGrid />
-            ) : (
-              <View style={styles.events}>
-                {userEvents.length ? (
-                  userEvents.map((e) => <EventCard key={e.id} event={e} />)
-                ) : (
-                  <EmptyState icon="calendar-outline" title="No events yet" message="This organizer hasn't published any events." />
-                )}
-              </View>
-            )}
-          </>
-        ) : (
+        <HalfTabs value={tab} onChange={setTab} />
+        {tab === 'posts' ? (
           <PostGrid />
+        ) : (
+          <View style={styles.events}>
+            {userEvents.length ? (
+              userEvents.map((e) => <EventCard key={e.id} event={e} />)
+            ) : (
+              <EmptyState icon="calendar-outline" title="No events yet" message="This user hasn't shared any events." />
+            )}
+          </View>
         )}
       </ProfileHero>
     </Screen>
@@ -183,8 +191,20 @@ const styles = StyleSheet.create({
   stars: { flexDirection: 'row', alignItems: 'center', gap: 2, marginLeft: 8 },
   ratingText: { marginLeft: 4 },
   bio: { marginTop: 18, lineHeight: 21 },
-  actions: { flexDirection: 'row', gap: 10, marginTop: 12 },
-  pill: { flex: 1 },
+  statsCard: { paddingVertical: 8, paddingLeft: 10, paddingRight: 8 },
+  actions: { flexDirection: 'row', gap: 4 },
+  pill: {
+    height: 45,
+    minWidth: 70,
+    paddingHorizontal: 8,
+    borderRadius: radius.lg,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  pillText: { fontFamily: fonts.semibold, fontSize: 14, lineHeight: 18, color: colors.white },
+  pressed: { opacity: 0.85 },
   tabs: { flexDirection: 'row', marginTop: 20, gap: 8 },
   tab: { flex: 1, height: 44, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
   tabActive: { backgroundColor: colors.primary },

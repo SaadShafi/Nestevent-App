@@ -6,7 +6,7 @@ import { AppText, Button, Divider, Input, NestLogo, Screen, useToast } from '@/c
 import { haptic } from '@/lib/haptics';
 import { isEmail, required } from '@/lib/validation';
 import { useAuthStore } from '@/store';
-import { colors } from '@/theme';
+import { colors, fonts } from '@/theme';
 
 import { AuthCard } from '../components/AuthCard';
 import { Checkbox } from '../components/Checkbox';
@@ -59,7 +59,7 @@ export function LoginScreen() {
       <View style={styles.logo}>
         <NestLogo size={44} />
       </View>
-      <AppText variant="displaySm" center style={styles.title}>
+      <AppText variant="heading" center numberOfLines={1} adjustsFontSizeToFit style={styles.title}>
         Sign in to your Account
       </AppText>
       <AppText variant="caption" center secondary style={styles.subtitle}>
@@ -68,6 +68,7 @@ export function LoginScreen() {
 
       <AuthCard>
         <Input
+          dense
           label="Email Address"
           placeholder="Enter Your Email"
           value={email}
@@ -85,6 +86,7 @@ export function LoginScreen() {
           onSubmitEditing={() => passwordRef.current?.focus()}
         />
         <Input
+          dense
           ref={passwordRef}
           label="Password"
           placeholder="Enter Your Password"
@@ -102,9 +104,9 @@ export function LoginScreen() {
         />
 
         <View style={styles.rememberRow}>
-          <Checkbox checked={remember} onChange={setRemember} label="Remember me" />
+          <Checkbox dense checked={remember} onChange={setRemember} label="Remember me" />
           <Pressable onPress={() => router.push('/(auth)/forgot-password')} hitSlop={8}>
-            <AppText variant="label">Forgot Password ?</AppText>
+            <AppText variant="caption">Forgot Password ?</AppText>
           </Pressable>
         </View>
 
@@ -125,11 +127,11 @@ export function LoginScreen() {
         )}
 
         <View style={styles.footer}>
-          <AppText variant="label" secondary>
+          <AppText variant="caption" secondary>
             Don't Have An Account?{' '}
           </AppText>
           <Pressable onPress={() => router.push('/(auth)/register')} hitSlop={8}>
-            <AppText variant="label" color={colors.primary}>
+            <AppText variant="caption" color={colors.primary} style={styles.link}>
               Sign Up Now
             </AppText>
           </Pressable>
@@ -146,5 +148,6 @@ const styles = StyleSheet.create({
   title: { marginBottom: 6 },
   subtitle: { marginBottom: 20 },
   rememberRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, marginTop: 4 },
+  link: { fontFamily: fonts.semibold },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 12, paddingBottom: 4 },
 });

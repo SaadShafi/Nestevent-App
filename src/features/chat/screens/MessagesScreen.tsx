@@ -36,7 +36,7 @@ export function MessagesScreen() {
           />
         }
       />
-      <SearchBar value={query} onChangeText={setQuery} containerStyle={styles.search} />
+      <SearchBar tone="dark" value={query} onChangeText={setQuery} containerStyle={styles.search} />
       <FlatList
         data={data}
         keyExtractor={(c) => c.id}

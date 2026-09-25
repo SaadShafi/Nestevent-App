@@ -77,7 +77,7 @@ export function HomeScreen() {
         </AppText>
       ) : (
         <Pressable onPress={() => goSearch({ q: '' })} style={styles.searchWrap}>
-          <SearchBar editable={false} pointerEvents="none" containerStyle={styles.search} />
+          <SearchBar tone="glass" editable={false} pointerEvents="none" />
         </Pressable>
       )}
     </GradientHeader>
@@ -115,7 +115,6 @@ export function HomeScreen() {
 const styles = StyleSheet.create({
   browseTitle: { marginTop: 24, marginBottom: 4 },
   searchWrap: { marginTop: 18 },
-  search: { opacity: 0.95 },
   section: { paddingHorizontal: layout.screenPadding, marginTop: 8 },
   tabs: { paddingHorizontal: layout.screenPadding, paddingBottom: 16 },
   list: { paddingHorizontal: layout.screenPadding },

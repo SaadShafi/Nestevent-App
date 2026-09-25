@@ -16,10 +16,12 @@ type Props = {
   /** Filled orange when selected (Create Post sheet) instead of outlined (Select Role) */
   filled?: boolean;
   compact?: boolean;
+  /** Override the selected check colour (Create Post sheet uses the green tick). */
+  checkColor?: string;
 };
 
 /** Selectable card with check badge — Select Role, Attendance Model, Create Post sheet. */
-export function OptionCard({ title, description, icon, selected, onPress, filled, compact }: Props) {
+export function OptionCard({ title, description, icon, selected, onPress, filled, compact, checkColor }: Props) {
   return (
     <Pressable
       onPress={() => {
@@ -38,7 +40,7 @@ export function OptionCard({ title, description, icon, selected, onPress, filled
           <AppText variant="label" style={styles.flex}>
             {title}
           </AppText>
-          {selected ? <Icon name="checkmark-circle" size={22} color={filled ? colors.white : colors.success} /> : null}
+          {selected ? <Icon name="checkmark-circle" size={22} color={checkColor ?? (filled ? colors.white : colors.success)} /> : null}
         </View>
       ) : (
         <>

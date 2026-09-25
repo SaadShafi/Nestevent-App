@@ -4,6 +4,7 @@ import { type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { WAVE_H, WaveEdge } from '@/components/WaveEdge';
 import { colors, layout } from '@/theme';
 
 type Props = {
@@ -13,12 +14,14 @@ type Props = {
   overlay?: ReactNode;
   /** Content of the curved dark sheet that overlaps the cover. */
   children: ReactNode;
+  /** Figma "Details" hill: the sheet's top edge is a wave instead of rounded corners. */
+  wave?: boolean;
 };
 
 const CURVE = 40;
 
 /** Full-bleed cover image with a curved dark sheet overlapping its bottom edge (Profile / User Details). */
-export function ProfileHero({ cover, height = 250, overlay, children }: Props) {
+export function ProfileHero({ cover, height = 250, overlay, children, wave }: Props) {
   const insets = useSafeAreaInsets();
   return (
     <View>
@@ -27,7 +30,14 @@ export function ProfileHero({ cover, height = 250, overlay, children }: Props) {
         <LinearGradient colors={['rgba(0,0,0,0.45)', 'transparent']} style={styles.topShade} />
         {overlay ? <View style={[styles.overlay, { top: insets.top + 8 }]}>{overlay}</View> : null}
       </View>
-      <View style={styles.sheet}>{children}</View>
+      {wave ? (
+        <View style={styles.waveWrap}>
+          <WaveEdge />
+          <View style={styles.waveSheet}>{children}</View>
+        </View>
+      ) : (
+        <View style={styles.sheet}>{children}</View>
+      )}
     </View>
   );
 }
@@ -43,4 +53,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: layout.screenPadding,
     paddingTop: 28,
   },
+  waveWrap: { marginTop: -WAVE_H },
+  waveSheet: { backgroundColor: colors.bg, paddingHorizontal: layout.screenPadding, paddingTop: 16 },
 });

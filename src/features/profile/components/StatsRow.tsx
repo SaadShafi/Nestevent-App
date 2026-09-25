@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { AppText } from '@/components/ui';
 import { formatCompact } from '@/lib/format';
@@ -15,6 +15,9 @@ type Props = {
   onPressFollowing?: () => void;
   /** Right-hand action(s): "Friend list" pill, or Follow + Message. */
   action?: ReactNode;
+  /** Space between the three counts (default 14). */
+  statsGap?: number;
+  style?: StyleProp<ViewStyle>;
 };
 
 function Stat({ value, label, onPress }: { value: number; label: string; onPress?: () => void }) {
@@ -40,12 +43,14 @@ function Stat({ value, label, onPress }: { value: number; label: string; onPress
 }
 
 /** Posts / Followers / Followings card with a right-hand action slot. */
-export function StatsRow({ posts, followers, following, onPressPosts, onPressFollowers, onPressFollowing, action }: Props) {
+export function StatsRow({ posts, followers, following, onPressPosts, onPressFollowers, onPressFollowing, action, statsGap = 14, style }: Props) {
   return (
-    <View style={styles.card}>
-      <Stat value={posts} label="Posts" onPress={onPressPosts} />
-      <Stat value={followers} label="Followers" onPress={onPressFollowers} />
-      <Stat value={following} label="Followings" onPress={onPressFollowing} />
+    <View style={[styles.card, style]}>
+      <View style={[styles.stats, { gap: statsGap }]}>
+        <Stat value={posts} label="Posts" onPress={onPressPosts} />
+        <Stat value={followers} label="Followers" onPress={onPressFollowers} />
+        <Stat value={following} label="Followings" onPress={onPressFollowing} />
+      </View>
       <View style={styles.spacer} />
       {action ? <View style={styles.action}>{action}</View> : null}
     </View>
@@ -62,6 +67,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     gap: 14,
   },
+  stats: { flexDirection: 'row', alignItems: 'center' },
   stat: { alignItems: 'center', gap: 2 },
   pressed: { opacity: 0.7 },
   spacer: { flex: 1 },

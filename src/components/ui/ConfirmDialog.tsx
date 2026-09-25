@@ -5,6 +5,7 @@ import { Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { colors, radius } from '@/theme';
 
 import { AppText } from './AppText';
+import { useBlurTarget } from './BlurTarget';
 import { Button, type ButtonVariant } from './Button';
 
 type Props = {
@@ -34,10 +35,15 @@ export function ConfirmDialog({
   confirmVariant = 'white',
   placement = 'center',
 }: Props) {
+  const blurTarget = useBlurTarget();
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
       <View style={[styles.root, placement === 'bottom' && styles.rootBottom]}>
-        {Platform.OS === 'ios' ? <BlurView intensity={35} tint="dark" style={StyleSheet.absoluteFill} /> : null}
+        {Platform.OS === 'ios' ? (
+          <BlurView intensity={35} tint="dark" style={StyleSheet.absoluteFill} />
+        ) : blurTarget ? (
+          <BlurView intensity={35} tint="dark" blurTarget={blurTarget} blurMethod="dimezisBlurViewSdk31Plus" style={StyleSheet.absoluteFill} />
+        ) : null}
         <Pressable style={[StyleSheet.absoluteFill, styles.dim]} onPress={onClose} />
         <View style={[styles.card, placement === 'bottom' && styles.cardBottom]}>
           {icon ? <View style={styles.icon}>{icon}</View> : null}

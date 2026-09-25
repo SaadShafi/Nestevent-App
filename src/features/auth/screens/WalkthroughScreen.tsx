@@ -13,7 +13,6 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppText, Icon } from '@/components/ui';
-import { IMG } from '@/data/images';
 import { haptic } from '@/lib/haptics';
 import { useAuthStore } from '@/store';
 import { colors, radius } from '@/theme';
@@ -23,10 +22,11 @@ import { WalkthroughPage, type WalkthroughSlide } from '../components/Walkthroug
 const BODY =
   'Harmonia brings you closer to the music you love — from intimate gigs to the biggest festival stages.';
 
+// Backgrounds exported from the Figma Walkthrough 1 / 4 / 5 frames.
 const SLIDES: WalkthroughSlide[] = [
-  { key: '1', image: IMG.walkthrough1, title: 'Welcome to\nNest Event', body: BODY },
-  { key: '2', image: IMG.walkthrough2, title: 'Search and\nDiscover', body: BODY },
-  { key: '3', image: IMG.walkthrough3, title: 'People Connect\nhere on Nest', body: BODY },
+  { key: '1', image: require('@/assets/images/walkthrough-1.jpg'), title: 'Welcome to\nNest Event', body: BODY },
+  { key: '2', image: require('@/assets/images/walkthrough-2.jpg'), title: 'Search and\nDiscover', body: BODY },
+  { key: '3', image: require('@/assets/images/walkthrough-3.jpg'), title: 'People Connect\nhere on Nest', body: BODY },
 ];
 
 export function WalkthroughScreen() {

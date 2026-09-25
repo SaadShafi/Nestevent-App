@@ -31,6 +31,8 @@ export type InputProps = TextInputProps & {
   onPressField?: () => void;
   /** Outlined variant (thin border, used by Marketing Hub forms) */
   outlined?: boolean;
+  /** Figma auth-form type: 12pt medium label and 12pt value (Login / Register). */
+  dense?: boolean;
 };
 
 export const Input = forwardRef<TextInput, InputProps>(function Input(
@@ -49,6 +51,7 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
     value,
     onPressField,
     outlined,
+    dense,
     style,
     editable = true,
     ...rest
@@ -88,7 +91,7 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
           setFocused(false);
           rest.onBlur?.(e);
         }}
-        style={[styles.input, multiline && styles.inputMultiline, style]}
+        style={[styles.input, dense && styles.inputDense, multiline && styles.inputMultiline, style]}
         {...rest}
       />
       {password ? (
@@ -110,9 +113,9 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
     <View style={[styles.container, containerStyle]}>
       {label ? (
         <View style={styles.labelRow}>
-          <AppText variant="label">{label}</AppText>
+          <AppText variant={dense ? 'captionMedium' : 'label'}>{label}</AppText>
           {labelHint ? (
-            <AppText variant="label" muted>
+            <AppText variant={dense ? 'captionMedium' : 'label'} muted>
               {' '}
               {labelHint}
             </AppText>
@@ -165,6 +168,7 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     height: '100%',
   },
+  inputDense: { fontSize: 12 },
   inputMultiline: { textAlignVertical: 'top', height: undefined, minHeight: 90 },
   adornment: { alignItems: 'center', justifyContent: 'center' },
   counter: { position: 'absolute', right: 16, bottom: 10 },
