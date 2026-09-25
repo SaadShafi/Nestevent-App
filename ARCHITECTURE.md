@@ -100,6 +100,15 @@ Domain types: `@/data/types`. Seed data + helpers (`findUser`, `findOrganization
 - Never hard-code white backgrounds; the app is dark-only. Use `colors.*` tokens.
 - Headings that are bold display type in Figma ("Choose Interests", "Browse Mode For You", "Add Ticket Type") use `variant="display"` / `"displaySm"`.
 
+## iOS native build on Xcode < 26.4
+
+SDK 57 officially needs Xcode 26.4+. This repo builds on Xcode 26.1.1 thanks to:
+
+- `patches/expo-modules-jsi+57.1.0.patch` and `patches/expo-modules-core+57.0.18.patch`, applied by the `postinstall` script (`patch-package`). They replace `weak let` with `nonisolated(unsafe) weak var`, drop the `SWIFT_RETURNS_RETAINED` constructor annotations on `RuntimeScheduler`, and box the host-function pointer captures in `JavaScriptRuntime.swift` (`UnsafeSendableBox`). Behaviour is identical; the syntax is just what the older Swift accepts.
+- `package.json` → `expo.autolinking.ios.buildFromSource: ["ExpoContacts"]`: Expo's prebuilt ExpoContacts framework links `Testing.framework`, which crashes at launch on the simulator, so that one pod compiles from source.
+
+When upgrading Expo, regenerate the patches (`npx patch-package expo-modules-jsi --exclude 'apple/(\.build|\.DerivedData|\.swiftpm|\.generated|\.xcframework-slices|Products)/'`) or update Xcode and delete them.
+
 ## Navigation
 
 - Root Stack (`src/app/_layout.tsx`) already declares modal presentation for: `filter`, `create-post/index` (transparent), `create-post/camera` (fullScreen), `event/[id]/cart|checkout|ticket-order`, `delivery-address`, `organizer/event/[id]/scan`.
